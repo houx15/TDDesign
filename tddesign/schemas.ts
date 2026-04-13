@@ -42,10 +42,16 @@ const BaseCheckFields = {
 };
 
 export const CheckSchema = z.discriminatedUnion("type", [
-  z.object({ ...BaseCheckFields, type: z.literal("exact"), expected: z.string() }),
+  z.object({
+    ...BaseCheckFields,
+    type: z.literal("exact"),
+    property: z.string().min(1),
+    expected: z.string(),
+  }),
   z.object({
     ...BaseCheckFields,
     type: z.literal("range"),
+    property: z.string().min(1),
     min: z.number(),
     max: z.number(),
     unit: z.string(),

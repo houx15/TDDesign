@@ -7,28 +7,38 @@ import {
 } from "../../tddesign/composer/checks.js";
 
 describe("check generators", () => {
-  it("builds an exact check", () => {
+  it("builds an exact check with a property", () => {
     const c = exactCheck({
       id: "color.background",
       dimension: "color_direction",
       rule: "Background is #0F0F10",
+      property: "background-color",
       expected: "#0F0F10",
     });
     expect(c.type).toBe("exact");
-    expect(c).toMatchObject({ expected: "#0F0F10" });
+    expect(c).toMatchObject({
+      property: "background-color",
+      expected: "#0F0F10",
+    });
   });
 
-  it("builds a range check", () => {
+  it("builds a range check with a property", () => {
     const c = rangeCheck({
       id: "layout.hero_section_padding",
       dimension: "layout_spacing",
       rule: "Hero section padding between 48 and 96 px",
+      property: "padding-block",
       min: 48,
       max: 96,
       unit: "px",
     });
     expect(c.type).toBe("range");
-    expect(c).toMatchObject({ min: 48, max: 96, unit: "px" });
+    expect(c).toMatchObject({
+      property: "padding-block",
+      min: 48,
+      max: 96,
+      unit: "px",
+    });
   });
 
   it("builds a pattern check (absent)", () => {

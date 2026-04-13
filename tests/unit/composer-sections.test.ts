@@ -26,6 +26,7 @@ describe("stitch sections", () => {
           id: "color.background",
           dimension: "color_direction",
           rule: "Background is #0F0F10",
+          property: "background-color",
           expected: "#0F0F10",
         }),
       ],

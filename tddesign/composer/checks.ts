@@ -7,12 +7,19 @@ interface BaseArgs {
   rule: string;
 }
 
-export function exactCheck(args: BaseArgs & { expected: string }): Check {
+export function exactCheck(
+  args: BaseArgs & { property: string; expected: string }
+): Check {
   return CheckSchema.parse({ type: "exact", ...args });
 }
 
 export function rangeCheck(
-  args: BaseArgs & { min: number; max: number; unit: string }
+  args: BaseArgs & {
+    property: string;
+    min: number;
+    max: number;
+    unit: string;
+  }
 ): Check {
   return CheckSchema.parse({ type: "range", ...args });
 }

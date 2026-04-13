@@ -36,12 +36,38 @@ describe("schemas", () => {
       type: "exact",
       dimension: "color_direction",
       rule: "Background color is #0F0F10",
+      property: "background-color",
       expected: "#0F0F10",
     };
     expect(() => CheckSchema.parse(check)).not.toThrow();
   });
 
+  it("rejects an exact-type check missing property", () => {
+    const check = {
+      id: "color.background",
+      type: "exact",
+      dimension: "color_direction",
+      rule: "Background color is #0F0F10",
+      expected: "#0F0F10",
+    };
+    expect(() => CheckSchema.parse(check)).toThrow();
+  });
+
   it("accepts a range-type check", () => {
+    const check = {
+      id: "spacing.padding",
+      type: "range",
+      dimension: "layout_spacing",
+      rule: "Section padding between 24 and 48 px",
+      property: "padding-block",
+      min: 24,
+      max: 48,
+      unit: "px",
+    };
+    expect(() => CheckSchema.parse(check)).not.toThrow();
+  });
+
+  it("rejects a range-type check missing property", () => {
     const check = {
       id: "spacing.padding",
       type: "range",
@@ -51,7 +77,7 @@ describe("schemas", () => {
       max: 48,
       unit: "px",
     };
-    expect(() => CheckSchema.parse(check)).not.toThrow();
+    expect(() => CheckSchema.parse(check)).toThrow();
   });
 
   it("accepts a pattern-type check", () => {
