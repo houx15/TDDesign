@@ -1,0 +1,43 @@
+{
+  "total": 6,
+  "passed": 3,
+  "failed": 3,
+  "results": [
+    {
+      "check_id": "color.background",
+      "passed": false,
+      "expected": "#0F0F10",
+      "actual": "#0A0A0A",
+      "message": "No element has background-color=#0F0F10"
+    },
+    {
+      "check_id": "color.text_primary",
+      "passed": true,
+      "expected": "#FAFAFA",
+      "actual": "#FAFAFA"
+    },
+    {
+      "check_id": "color.accent",
+      "passed": true,
+      "expected": "#5B6EE1",
+      "actual": "#0A0A0A"
+    },
+    {
+      "check_id": "layout.hero_section_padding",
+      "passed": false,
+      "expected": "48px..96px",
+      "actual": "16px",
+      "message": "No padding-block value falls within [48, 96]px"
+    },
+    {
+      "check_id": "detail.no_emoji",
+      "passed": false,
+      "message": "Pattern absent:emoji violated"
+    },
+    {
+      "check_id": "atmosphere.minimal_precise",
+      "passed": true,
+      "message": "advisory (subjective check not evaluated in v0)"
+    }
+  ]
+}
