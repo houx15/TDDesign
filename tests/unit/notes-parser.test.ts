@@ -83,6 +83,56 @@ describe("notes-parser: hex extractor", () => {
   });
 });
 
+describe("notes-parser: range extractor", () => {
+  it("extracts the frozen hero padding range from the fixture notes", () => {
+    const v = makeVector({
+      layout_spacing: {
+        choice: "spacious-hero",
+        notes: "Section padding between 48 and 96 px",
+      },
+    });
+    const checks = parsePreferenceVector(v);
+    const pad = checks.find((c) => c.id === "layout.hero_section_padding");
+    if (!pad || pad.type !== "range") throw new Error("pad");
+    expect(pad).toMatchObject({
+      id: "layout.hero_section_padding",
+      type: "range",
+      dimension: "layout_spacing",
+      rule: "Hero section vertical padding between 48 and 96 px",
+      property: "padding-block",
+      min: 48,
+      max: 96,
+      unit: "px",
+    });
+  });
+
+  it("supports the N-M <unit> alt syntax with padding keyword", () => {
+    const v = makeVector({
+      layout_spacing: { choice: "x", notes: "padding 32-64 px" },
+    });
+    const [pad] = parsePreferenceVector(v);
+    if (!pad || pad.type !== "range") throw new Error("pad");
+    expect(pad.min).toBe(32);
+    expect(pad.max).toBe(64);
+  });
+
+  it("rejects a range where min >= max", () => {
+    const v = makeVector({
+      layout_spacing: { choice: "x", notes: "padding between 96 and 48 px" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+
+  it("ignores padding ranges found outside layout_spacing dimension", () => {
+    const v = makeVector({
+      detail_elements: { choice: "x", notes: "padding between 10 and 20 px" },
+    });
+    // WI-3 only wires layout_spacing; detail_elements WI-4 handles its own things.
+    const checks = parsePreferenceVector(v);
+    expect(checks.find((c) => c.id === "layout.hero_section_padding")).toBeUndefined();
+  });
+});
+
 describe("notes-parser: scaffold", () => {
   it("returns [] when all notes are empty", () => {
     expect(parsePreferenceVector(makeVector())).toEqual([]);
