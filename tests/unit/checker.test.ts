@@ -153,6 +153,39 @@ describe("checker", () => {
     expect(report.results[0].message).toMatch(/advisory/i);
   });
 
+  it("routes each exact check to its own property, not the id prefix", () => {
+    const multiProp: StyleFact[] = [
+      {
+        element_id: "el#0",
+        tag: "div",
+        classes: [],
+        resolved: { "background-color": "#111111", color: "#EEEEEE" },
+        text: "",
+      },
+    ];
+    const checks: Check[] = [
+      {
+        id: "arbitrary.one",
+        type: "exact",
+        dimension: "color_direction",
+        rule: "bg",
+        property: "background-color",
+        expected: "#111111",
+      },
+      {
+        id: "arbitrary.two",
+        type: "exact",
+        dimension: "color_direction",
+        rule: "fg",
+        property: "color",
+        expected: "#EEEEEE",
+      },
+    ];
+    const report = runChecker({ task: "t", checks }, multiProp);
+    expect(report.passed).toBe(2);
+    expect(report.failed).toBe(0);
+  });
+
   it("aggregates totals correctly across multiple checks", () => {
     const checks: Check[] = [
       {

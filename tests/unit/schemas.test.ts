@@ -80,6 +80,18 @@ describe("schemas", () => {
     expect(() => CheckSchema.parse(check)).toThrow();
   });
 
+  it("rejects an exact-type check with an empty property", () => {
+    const check = {
+      id: "color.background",
+      type: "exact",
+      dimension: "color_direction",
+      rule: "Background color is #0F0F10",
+      property: "",
+      expected: "#0F0F10",
+    };
+    expect(() => CheckSchema.parse(check)).toThrow();
+  });
+
   it("accepts a pattern-type check", () => {
     const check = {
       id: "detail.no_emoji",
