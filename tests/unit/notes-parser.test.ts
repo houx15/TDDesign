@@ -83,6 +83,55 @@ describe("notes-parser: hex extractor", () => {
   });
 });
 
+describe("notes-parser: hex extractor hardening (H1)", () => {
+  it("handles multiple hexes in one clause joined by conjunction without comma", () => {
+    const v = makeVector({
+      color_direction: {
+        choice: "x",
+        notes: "Background is #0F0F10 and primary text is #FAFAFA",
+      },
+    });
+    const checks = parsePreferenceVector(v);
+    const bg = checks.find((c) => c.id === "color.background");
+    const tp = checks.find((c) => c.id === "color.text_primary");
+    if (!bg || bg.type !== "exact") throw new Error("bg");
+    if (!tp || tp.type !== "exact") throw new Error("tp");
+    expect(bg.expected).toBe("#0F0F10");
+    expect(tp.expected).toBe("#FAFAFA");
+  });
+
+  it("does not treat bare 'primary button' as a text_primary role hit", () => {
+    const v = makeVector({
+      color_direction: { choice: "x", notes: "primary button #5B6EE1" },
+    });
+    const checks = parsePreferenceVector(v);
+    expect(checks.find((c) => c.id === "color.text_primary")).toBeUndefined();
+  });
+
+  it("binds hex to nearest role keyword, not the first keyword in clause", () => {
+    const v = makeVector({
+      color_direction: {
+        choice: "x",
+        notes: "background color is #0F0F10 and #FAFAFA is primary text",
+      },
+    });
+    const checks = parsePreferenceVector(v);
+    const bg = checks.find((c) => c.id === "color.background");
+    const tp = checks.find((c) => c.id === "color.text_primary");
+    if (!bg || bg.type !== "exact") throw new Error("bg");
+    if (!tp || tp.type !== "exact") throw new Error("tp");
+    expect(bg.expected).toBe("#0F0F10");
+    expect(tp.expected).toBe("#FAFAFA");
+  });
+
+  it("rejects 3-digit shorthand hex (v0 parser: 6-digit only)", () => {
+    const v = makeVector({
+      color_direction: { choice: "x", notes: "Background #fff" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+});
+
 describe("notes-parser: range extractor", () => {
   it("extracts the frozen hero padding range from the fixture notes", () => {
     const v = makeVector({
@@ -130,6 +179,92 @@ describe("notes-parser: range extractor", () => {
     // WI-3 only wires layout_spacing; detail_elements WI-4 handles its own things.
     const checks = parsePreferenceVector(v);
     expect(checks.find((c) => c.id === "layout.hero_section_padding")).toBeUndefined();
+  });
+});
+
+describe("notes-parser: range extractor hardening (H2)", () => {
+  it("binds range to padding clause even when gap clause appears first", () => {
+    const v = makeVector({
+      layout_spacing: {
+        choice: "x",
+        notes: "gap between 8 and 16 px, padding between 48 and 96 px",
+      },
+    });
+    const [pad] = parsePreferenceVector(v);
+    if (!pad || pad.type !== "range") throw new Error("pad");
+    expect(pad.min).toBe(48);
+    expect(pad.max).toBe(96);
+  });
+
+  it("binds range to padding clause when padding clause appears first", () => {
+    const v = makeVector({
+      layout_spacing: {
+        choice: "x",
+        notes: "padding between 48 and 96 px, gap between 8 and 16 px",
+      },
+    });
+    const [pad] = parsePreferenceVector(v);
+    if (!pad || pad.type !== "range") throw new Error("pad");
+    expect(pad.min).toBe(48);
+    expect(pad.max).toBe(96);
+  });
+});
+
+describe("notes-parser: overall_style adjective source (H3)", () => {
+  it("fires atmosphere check for choice 'minimal-precise' with empty notes", () => {
+    const v = makeVector({
+      overall_style: { choice: "minimal-precise", notes: "" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeDefined();
+  });
+
+  it("does NOT fire atmosphere check for choice 'clean-precise' with empty notes", () => {
+    const v = makeVector({
+      overall_style: { choice: "clean-precise", notes: "" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeUndefined();
+  });
+
+  it("fires atmosphere check from notes regardless of unrelated choice", () => {
+    const v = makeVector({
+      overall_style: { choice: "whatever", notes: "Minimal and precise" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeDefined();
+  });
+
+  it("does not fire atmosphere check from unrelated notes", () => {
+    const v = makeVector({
+      overall_style: { choice: "whatever", notes: "Bold playful" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeUndefined();
+  });
+});
+
+describe("notes-parser: dimension iteration order (M1)", () => {
+  it("produces the frozen 6-ID sequence for the fixture vector", async () => {
+    const fixture = await import("../fixtures/preference_vector.json");
+    const pv = PreferenceVectorSchema.parse(fixture.default ?? fixture);
+    const ids = parsePreferenceVector(pv).map((c) => c.id);
+    expect(ids).toEqual([
+      "color.background",
+      "color.text_primary",
+      "color.accent",
+      "layout.hero_section_padding",
+      "detail.no_emoji",
+      "atmosphere.minimal_precise",
+    ]);
   });
 });
 
