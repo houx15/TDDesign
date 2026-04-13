@@ -23,8 +23,7 @@ export function flatten(html: string): FlatElement[] {
 
 function walk(node: ParseNode, out: FlatElement[]): void {
   if (node.tagName) {
-    const attrs = node.attrs ?? [];
-    const classAttr = attrs.find((a) => a.name === "class");
+    const classAttr = (node.attrs ?? []).find((a) => a.name === "class");
     const classes = classAttr ? classAttr.value.split(/\s+/).filter(Boolean) : [];
     out.push({ tag: node.tagName, classes, text: textOf(node) });
   }

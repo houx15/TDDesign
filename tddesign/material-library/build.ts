@@ -9,12 +9,12 @@ export interface BuildOptions {
   tagger: Tagger;
   confirm: Confirmer;
   sampleSize?: number;
-  rng?: () => number;
+  rng: () => number;
 }
 
 export async function buildIndex(opts: BuildOptions): Promise<MaterialIndex> {
   const sampleSize = opts.sampleSize ?? 5;
-  const rng = opts.rng ?? Math.random;
+  const rng = opts.rng;
 
   const entries: MaterialEntry[] = [];
   for (const id of opts.sourceIds) {

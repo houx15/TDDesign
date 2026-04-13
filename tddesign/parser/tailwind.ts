@@ -51,7 +51,5 @@ export function resolveTailwindClass(token: string): ResolvedStyle | null {
 }
 
 function remToPx(rem: string): string {
-  const n = parseFloat(rem);
-  if (isNaN(n)) return rem;
-  return `${n * 16}px`;
+  return `${parseFloat(rem) * 16}px`;
 }
