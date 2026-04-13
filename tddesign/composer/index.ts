@@ -3,7 +3,7 @@ import type {
   MaterialIndex,
   PreferenceVector,
 } from "../schemas.js";
-import { exactCheck, patternCheck, rangeCheck, subjectiveCheck } from "./checks.js";
+import { parsePreferenceVector } from "./notes-parser.js";
 import { buildSection, STITCH_SECTIONS } from "./sections.js";
 import type { StitchSection } from "./sections.js";
 
@@ -12,64 +12,11 @@ export interface ComposeResult {
   checks: Check[];
 }
 
-// v0: the six checks below are hardcoded for the acceptance fixture in
-// tests/fixtures/preference_vector.json. The vector's notes fields
-// ("Background #0F0F10...", "between 48 and 96 px", "No emoji") are not yet
-// parsed — a notes parser is Phase 2 work. For any second fixture, this
-// composer will emit the same checks regardless of the vector. See
-// docs/superpowers/specs/2026-04-13-tddesign-v0-design.md §"Slice 3" and
-// the v0 review in commit history.
 export function compose(
   vector: PreferenceVector,
   _library: MaterialIndex
 ): ComposeResult {
-  const sel = vector.selections;
-
-  const checks: Check[] = [
-    exactCheck({
-      id: "color.background",
-      dimension: "color_direction",
-      rule: "Background color is #0F0F10",
-      property: "background-color",
-      expected: "#0F0F10",
-    }),
-    exactCheck({
-      id: "color.text_primary",
-      dimension: "color_direction",
-      rule: "Primary text color is #FAFAFA",
-      property: "color",
-      expected: "#FAFAFA",
-    }),
-    exactCheck({
-      id: "color.accent",
-      dimension: "color_direction",
-      rule: "Accent color is #5B6EE1",
-      property: "background-color",
-      expected: "#5B6EE1",
-    }),
-    rangeCheck({
-      id: "layout.hero_section_padding",
-      dimension: "layout_spacing",
-      rule: "Hero section vertical padding between 48 and 96 px",
-      property: "padding-block",
-      min: 48,
-      max: 96,
-      unit: "px",
-    }),
-    patternCheck({
-      id: "detail.no_emoji",
-      dimension: "detail_elements",
-      rule: "No emoji characters anywhere in the rendered page",
-      mode: "absent",
-      target: "emoji",
-    }),
-    subjectiveCheck({
-      id: "atmosphere.minimal_precise",
-      dimension: "overall_style",
-      rule: "Overall atmosphere feels minimal and precise",
-      criterion: sel.overall_style.choice,
-    }),
-  ];
+  const checks: Check[] = parsePreferenceVector(vector);
 
   const sectionDimension: Record<StitchSection, string> = {
     "Visual Theme & Atmosphere": "overall_style",

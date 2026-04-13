@@ -196,6 +196,52 @@ describe("notes-parser: subjective fallback for overall_style", () => {
   });
 });
 
+describe("notes-parser: branch coverage fill-ins", () => {
+  it("ignores color clauses without any hex value", () => {
+    const v = makeVector({
+      color_direction: { choice: "x", notes: "Background is dark, accent #5B6EE1" },
+    });
+    const checks = parsePreferenceVector(v);
+    expect(checks.find((c) => c.id === "color.background")).toBeUndefined();
+    expect(checks.find((c) => c.id === "color.accent")).toBeDefined();
+  });
+
+  it("only emits one check per role when the role repeats", () => {
+    const v = makeVector({
+      color_direction: {
+        choice: "x",
+        notes: "Background #111111; Background #222222",
+      },
+    });
+    const bgs = parsePreferenceVector(v).filter((c) => c.id === "color.background");
+    expect(bgs).toHaveLength(1);
+    if (bgs[0].type !== "exact") throw new Error("bg");
+    expect(bgs[0].expected).toBe("#111111");
+  });
+
+  it("returns [] for layout notes without the padding keyword", () => {
+    const v = makeVector({
+      layout_spacing: { choice: "x", notes: "Gap between 8 and 16 px" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+
+  it("returns [] when layout notes contain padding but no numeric range", () => {
+    const v = makeVector({
+      layout_spacing: { choice: "x", notes: "Generous padding everywhere" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+
+  it("only emits one no-emoji check when the phrase repeats", () => {
+    const v = makeVector({
+      detail_elements: { choice: "x", notes: "No emoji. No emoji ever." },
+    });
+    const emojis = parsePreferenceVector(v).filter((c) => c.id === "detail.no_emoji");
+    expect(emojis).toHaveLength(1);
+  });
+});
+
 describe("notes-parser: scaffold", () => {
   it("returns [] when all notes are empty", () => {
     expect(parsePreferenceVector(makeVector())).toEqual([]);
