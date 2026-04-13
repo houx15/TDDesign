@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "stack": "node-typescript-vitest",
+  "packageManager": "npm",
+  "testCommand": "npm test",
+  "coverageCommand": "npx vitest run --coverage",
+  "coverageSummaryPath": "coverage/coverage-summary.json",
+  "mutationCommand": null,
+  "coverageThresholds": {
+    "lines": 100,
+    "functions": 100,
+    "branches": 100,
+    "statements": 100
+  },
+  "gates": {
+    "requireTestsBeforeImplementation": true,
+    "requireCoverageThreshold": true,
+    "requireMutationScore": false
+  }
+}
