@@ -1,5 +1,5 @@
 import type { Check, PreferenceVector } from "../schemas.js";
-import { exactCheck, patternCheck, rangeCheck } from "./checks.js";
+import { exactCheck, patternCheck, rangeCheck, subjectiveCheck } from "./checks.js";
 
 interface ColorRole {
   id: string;
@@ -114,11 +114,31 @@ function parseDetailElements(notes: string): Check[] {
   return checks;
 }
 
+function parseOverallStyle(choice: string, notes: string): Check[] {
+  // Search both the choice slug and the notes, normalizing hyphens to spaces,
+  // so "minimal-precise" is treated as "minimal precise".
+  const haystack = `${choice} ${notes}`.toLowerCase().replace(/-/g, " ");
+  const hasMinimal = /\bminimal\b/.test(haystack);
+  const hasPrecise = /\bprecise\b/.test(haystack);
+  const hasTechnical = /\btechnical\b/.test(haystack);
+  if (!hasMinimal) return [];
+  if (!hasPrecise && !hasTechnical) return [];
+  return [
+    subjectiveCheck({
+      id: "atmosphere.minimal_precise",
+      dimension: "overall_style",
+      rule: "Overall atmosphere feels minimal and precise",
+      criterion: choice,
+    }),
+  ];
+}
+
 export function parsePreferenceVector(pv: PreferenceVector): Check[] {
   const sel = pv.selections;
   const checks: Check[] = [];
   checks.push(...parseColors(sel.color_direction.notes));
   checks.push(...parseLayoutRanges(sel.layout_spacing.notes));
   checks.push(...parseDetailElements(sel.detail_elements.notes));
+  checks.push(...parseOverallStyle(sel.overall_style.choice, sel.overall_style.notes));
   return checks;
 }

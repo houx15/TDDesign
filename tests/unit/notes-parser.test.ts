@@ -158,6 +158,44 @@ describe("notes-parser: pattern-absent extractor", () => {
   });
 });
 
+describe("notes-parser: subjective fallback for overall_style", () => {
+  it("emits the frozen atmosphere check for the fixture choice+notes", () => {
+    const v = makeVector({
+      overall_style: { choice: "minimal-precise", notes: "" },
+    });
+    const checks = parsePreferenceVector(v);
+    const atm = checks.find((c) => c.id === "atmosphere.minimal_precise");
+    if (!atm || atm.type !== "subjective") throw new Error("atm");
+    expect(atm).toMatchObject({
+      id: "atmosphere.minimal_precise",
+      type: "subjective",
+      dimension: "overall_style",
+      rule: "Overall atmosphere feels minimal and precise",
+      criterion: "minimal-precise",
+    });
+  });
+
+  it("emits the atmosphere check when notes mention minimal and technical", () => {
+    const v = makeVector({
+      overall_style: { choice: "other", notes: "minimal, technical vibe" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeDefined();
+  });
+
+  it("does not emit atmosphere check when adjectives are absent", () => {
+    const v = makeVector({
+      overall_style: { choice: "playful", notes: "loud and chaotic" },
+    });
+    const atm = parsePreferenceVector(v).find(
+      (c) => c.id === "atmosphere.minimal_precise"
+    );
+    expect(atm).toBeUndefined();
+  });
+});
+
 describe("notes-parser: scaffold", () => {
   it("returns [] when all notes are empty", () => {
     expect(parsePreferenceVector(makeVector())).toEqual([]);
