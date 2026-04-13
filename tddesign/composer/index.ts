@@ -12,6 +12,13 @@ export interface ComposeResult {
   checks: Check[];
 }
 
+// v0: the six checks below are hardcoded for the acceptance fixture in
+// tests/fixtures/preference_vector.json. The vector's notes fields
+// ("Background #0F0F10...", "between 48 and 96 px", "No emoji") are not yet
+// parsed — a notes parser is Phase 2 work. For any second fixture, this
+// composer will emit the same checks regardless of the vector. See
+// docs/superpowers/specs/2026-04-13-tddesign-v0-design.md §"Slice 3" and
+// the v0 review in commit history.
 export function compose(
   vector: PreferenceVector,
   _library: MaterialIndex

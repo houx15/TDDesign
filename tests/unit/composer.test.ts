@@ -43,11 +43,8 @@ describe("composer", () => {
   it("generates the background check with the expected hex", () => {
     const { checks } = compose(vector, emptyLibrary);
     const bg = checks.find((c) => c.id === "color.background");
-    expect(bg).toBeDefined();
-    expect(bg!.type).toBe("exact");
-    if (bg!.type === "exact") {
-      expect(bg.expected).toBe("#0F0F10");
-    }
+    if (!bg || bg.type !== "exact") throw new Error("expected exact bg check");
+    expect(bg.expected).toBe("#0F0F10");
   });
 
   it("generates the hero padding range check with bounds 48..96 px", () => {

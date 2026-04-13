@@ -1,5 +1,5 @@
 import type { PreferenceVector, Report } from "../schemas.js";
-import { MaterialIndexSchema } from "../schemas.js";
+import { MaterialIndexSchema, PreferenceVectorSchema } from "../schemas.js";
 import { compose } from "../composer/index.js";
 import { planChecks } from "../planner/index.js";
 import { extractFacts } from "../parser/facts.js";
@@ -35,7 +35,9 @@ async function main(): Promise<void> {
     process.exit(2);
   }
   const { readFileSync } = await import("node:fs");
-  const vector = JSON.parse(readFileSync(vectorPath, "utf8"));
+  const vector = PreferenceVectorSchema.parse(
+    JSON.parse(readFileSync(vectorPath, "utf8"))
+  );
   const task = readFileSync(taskPath, "utf8").trim();
   const html = readFileSync(htmlPath, "utf8");
   const { report } = await runPipeline({ vector, task, html });
