@@ -133,6 +133,31 @@ describe("notes-parser: range extractor", () => {
   });
 });
 
+describe("notes-parser: pattern-absent extractor", () => {
+  it("extracts the frozen no-emoji check from the fixture notes", () => {
+    const v = makeVector({
+      detail_elements: { choice: "x", notes: "No emoji characters anywhere" },
+    });
+    const [emoji] = parsePreferenceVector(v);
+    if (!emoji || emoji.type !== "pattern") throw new Error("emoji");
+    expect(emoji).toMatchObject({
+      id: "detail.no_emoji",
+      type: "pattern",
+      dimension: "detail_elements",
+      rule: "No emoji characters anywhere in the rendered page",
+      mode: "absent",
+      target: "emoji",
+    });
+  });
+
+  it("ignores No <target> phrases with unknown targets", () => {
+    const v = makeVector({
+      detail_elements: { choice: "x", notes: "No wombats" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+});
+
 describe("notes-parser: scaffold", () => {
   it("returns [] when all notes are empty", () => {
     expect(parsePreferenceVector(makeVector())).toEqual([]);

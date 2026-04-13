@@ -1,5 +1,5 @@
 import type { Check, PreferenceVector } from "../schemas.js";
-import { exactCheck, rangeCheck } from "./checks.js";
+import { exactCheck, patternCheck, rangeCheck } from "./checks.js";
 
 interface ColorRole {
   id: string;
@@ -82,10 +82,43 @@ function parseLayoutRanges(notes: string): Check[] {
   ];
 }
 
+const ABSENT_TARGETS: Record<string, { id: string; rule: string }> = {
+  emoji: {
+    id: "detail.no_emoji",
+    rule: "No emoji characters anywhere in the rendered page",
+  },
+};
+
+function parseDetailElements(notes: string): Check[] {
+  if (!notes.trim()) return [];
+  const checks: Check[] = [];
+  const re = /\bNo\s+([a-z][a-z_-]*)/gi;
+  let m: RegExpExecArray | null;
+  const seen = new Set<string>();
+  while ((m = re.exec(notes)) !== null) {
+    const target = m[1].toLowerCase();
+    const spec = ABSENT_TARGETS[target];
+    if (!spec) continue;
+    if (seen.has(spec.id)) continue;
+    seen.add(spec.id);
+    checks.push(
+      patternCheck({
+        id: spec.id,
+        dimension: "detail_elements",
+        rule: spec.rule,
+        mode: "absent",
+        target,
+      })
+    );
+  }
+  return checks;
+}
+
 export function parsePreferenceVector(pv: PreferenceVector): Check[] {
   const sel = pv.selections;
   const checks: Check[] = [];
   checks.push(...parseColors(sel.color_direction.notes));
   checks.push(...parseLayoutRanges(sel.layout_spacing.notes));
+  checks.push(...parseDetailElements(sel.detail_elements.notes));
   return checks;
 }
