@@ -1,0 +1,43 @@
+{
+  "profile_name": "v0-fixture",
+  "scope": "project",
+  "selections": {
+    "overall_style": {
+      "choice": "minimal-precise",
+      "source_refs": ["linear", "vercel"],
+      "notes": ""
+    },
+    "color_direction": {
+      "choice": "near-black-with-indigo-accent",
+      "source_refs": ["linear"],
+      "notes": "Background #0F0F10, primary text #FAFAFA, accent #5B6EE1"
+    },
+    "typography": {
+      "choice": "geometric-sans",
+      "source_refs": ["vercel"],
+      "notes": "Inter"
+    },
+    "component_style": {
+      "choice": "subtle-radius-minimal-shadow",
+      "source_refs": ["linear"],
+      "notes": ""
+    },
+    "layout_spacing": {
+      "choice": "spacious-hero",
+      "source_refs": ["stripe"],
+      "notes": "Section padding between 48 and 96 px"
+    },
+    "detail_elements": {
+      "choice": "line-icons-no-emoji",
+      "source_refs": ["linear"],
+      "notes": "No emoji characters anywhere"
+    },
+    "motion": {
+      "choice": "subtle-fast",
+      "source_refs": ["vercel"],
+      "notes": ""
+    }
+  },
+  "created_at": "2026-04-13T00:00:00Z",
+  "updated_at": "2026-04-13T00:00:00Z"
+}
