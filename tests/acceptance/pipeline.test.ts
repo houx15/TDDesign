@@ -20,11 +20,11 @@ describe("end-to-end pipeline", () => {
   });
 
   it("fails exactly the three expected checks on the bad page", async () => {
-    const { report } = await runPipeline({ vector, task, html: badHtml });
-    const failedIds = report.results.filter((r) => !r.passed).map((r) => r.check_id).sort();
-    expect(failedIds).toEqual(
-      ["color.background", "detail.no_emoji", "layout.hero_section_padding"].sort()
+    const expected = JSON.parse(
+      readFileSync(fixtures("expected_report.json"), "utf8")
     );
+    const { report } = await runPipeline({ vector, task, html: badHtml });
+    expect(report).toEqual(expected);
   });
 
   it("emits a DESIGN.md containing all 9 Stitch sections", async () => {
