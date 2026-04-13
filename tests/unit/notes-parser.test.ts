@@ -25,6 +25,64 @@ function makeVector(overrides: Partial<Record<string, { choice: string; notes: s
   return PreferenceVectorSchema.parse(base);
 }
 
+describe("notes-parser: hex extractor", () => {
+  it("extracts three frozen color checks from the fixture notes", () => {
+    const v = makeVector({
+      color_direction: {
+        choice: "near-black-with-indigo-accent",
+        notes: "Background #0F0F10, primary text #FAFAFA, accent #5B6EE1",
+      },
+    });
+    const checks = parsePreferenceVector(v);
+    const bg = checks.find((c) => c.id === "color.background");
+    const tp = checks.find((c) => c.id === "color.text_primary");
+    const ac = checks.find((c) => c.id === "color.accent");
+    if (!bg || bg.type !== "exact") throw new Error("bg");
+    if (!tp || tp.type !== "exact") throw new Error("tp");
+    if (!ac || ac.type !== "exact") throw new Error("ac");
+    expect(bg).toMatchObject({
+      id: "color.background",
+      type: "exact",
+      dimension: "color_direction",
+      rule: "Background color is #0F0F10",
+      property: "background-color",
+      expected: "#0F0F10",
+    });
+    expect(tp).toMatchObject({
+      id: "color.text_primary",
+      type: "exact",
+      dimension: "color_direction",
+      rule: "Primary text color is #FAFAFA",
+      property: "color",
+      expected: "#FAFAFA",
+    });
+    expect(ac).toMatchObject({
+      id: "color.accent",
+      type: "exact",
+      dimension: "color_direction",
+      rule: "Accent color is #5B6EE1",
+      property: "background-color",
+      expected: "#5B6EE1",
+    });
+  });
+
+  it("preserves hex casing as written", () => {
+    const v = makeVector({
+      color_direction: { choice: "x", notes: "Background #111111" },
+    });
+    const [bg] = parsePreferenceVector(v);
+    if (!bg || bg.type !== "exact") throw new Error("bg");
+    expect(bg.expected).toBe("#111111");
+  });
+
+  it("ignores hex values without a known role keyword", () => {
+    const v = makeVector({
+      color_direction: { choice: "x", notes: "Mystery color #ABCDEF somewhere" },
+    });
+    expect(parsePreferenceVector(v)).toEqual([]);
+  });
+});
+
 describe("notes-parser: scaffold", () => {
   it("returns [] when all notes are empty", () => {
     expect(parsePreferenceVector(makeVector())).toEqual([]);
