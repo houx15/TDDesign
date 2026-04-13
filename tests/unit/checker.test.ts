@@ -33,6 +33,7 @@ describe("checker", () => {
       type: "exact",
       dimension: "color_direction",
       rule: "bg",
+      property: "background-color",
       expected: "#0F0F10",
     };
     const report = runChecker({ task: "t", checks: [check] }, facts);
@@ -45,6 +46,7 @@ describe("checker", () => {
       type: "exact",
       dimension: "color_direction",
       rule: "bg",
+      property: "background-color",
       expected: "#112233",
     };
     const report = runChecker({ task: "t", checks: [check] }, facts);
@@ -58,6 +60,7 @@ describe("checker", () => {
       type: "exact",
       dimension: "color_direction",
       rule: "text",
+      property: "color",
       expected: "#FAFAFA",
     };
     const report = runChecker({ task: "t", checks: [check] }, facts);
@@ -70,6 +73,7 @@ describe("checker", () => {
       type: "range",
       dimension: "layout_spacing",
       rule: "padding",
+      property: "padding-block",
       min: 48,
       max: 96,
       unit: "px",
@@ -87,6 +91,7 @@ describe("checker", () => {
       type: "range",
       dimension: "layout_spacing",
       rule: "padding",
+      property: "padding-block",
       min: 48,
       max: 96,
       unit: "px",
@@ -155,6 +160,7 @@ describe("checker", () => {
         type: "exact",
         dimension: "color_direction",
         rule: "bg",
+        property: "background-color",
         expected: "#0F0F10",
       },
       {
@@ -162,6 +168,7 @@ describe("checker", () => {
         type: "range",
         dimension: "layout_spacing",
         rule: "padding",
+        property: "padding-block",
         min: 1000,
         max: 2000,
         unit: "px",

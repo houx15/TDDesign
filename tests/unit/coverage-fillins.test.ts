@@ -65,13 +65,14 @@ describe("html parser empty-text edge cases", () => {
   });
 });
 
-describe("checker exact/range fallback property inference", () => {
-  it("color.accent maps to background-color", () => {
+describe("checker exact/range property routing", () => {
+  it("exact check reads the property declared on the check", () => {
     const check: Check = {
       id: "color.accent",
       type: "exact",
       dimension: "color_direction",
       rule: "accent",
+      property: "background-color",
       expected: "#5B6EE1",
     };
     const facts: StyleFact[] = [
@@ -87,12 +88,13 @@ describe("checker exact/range fallback property inference", () => {
     expect(r.failed).toBe(0);
   });
 
-  it("range check for radius uses border-radius property", () => {
+  it("range check reads the property declared on the check", () => {
     const check: Check = {
       id: "component.border_radius",
       type: "range",
       dimension: "component_style",
       rule: "radius",
+      property: "border-radius",
       min: 4,
       max: 12,
       unit: "px",
@@ -110,47 +112,6 @@ describe("checker exact/range fallback property inference", () => {
     expect(r.failed).toBe(0);
   });
 
-  it("exact check default property branch (unknown id)", () => {
-    const check: Check = {
-      id: "color.unknown",
-      type: "exact",
-      dimension: "color_direction",
-      rule: "x",
-      expected: "#000000",
-    };
-    const facts: StyleFact[] = [
-      {
-        element_id: "x#0",
-        tag: "div",
-        classes: [],
-        resolved: { "background-color": "#000000" },
-        text: "",
-      },
-    ];
-    expect(runChecker({ task: "t", checks: [check] }, facts).failed).toBe(0);
-  });
-
-  it("range check default property branch (unknown id)", () => {
-    const check: Check = {
-      id: "layout.unknown",
-      type: "range",
-      dimension: "layout_spacing",
-      rule: "x",
-      min: 0,
-      max: 100,
-      unit: "px",
-    };
-    const facts: StyleFact[] = [
-      {
-        element_id: "x#0",
-        tag: "div",
-        classes: [],
-        resolved: { "padding-block": "10px" },
-        text: "",
-      },
-    ];
-    expect(runChecker({ task: "t", checks: [check] }, facts).failed).toBe(0);
-  });
 });
 
 describe("composer body-for branches with empty notes", () => {

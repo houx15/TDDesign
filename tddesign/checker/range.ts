@@ -4,7 +4,7 @@ export function runRange(
   check: Extract<Check, { type: "range" }>,
   facts: StyleFact[]
 ): CheckResult {
-  const property = inferProperty(check.id);
+  const property = check.property;
   const raw = facts
     .map((f) => f.resolved[property])
     .filter((v): v is string => Boolean(v));
@@ -19,10 +19,4 @@ export function runRange(
       ? undefined
       : `No ${property} value falls within [${check.min}, ${check.max}]${check.unit}`,
   };
-}
-
-function inferProperty(id: string): string {
-  if (id.includes("padding")) return "padding-block";
-  if (id.includes("radius")) return "border-radius";
-  return "padding-block";
 }
