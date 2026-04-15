@@ -130,6 +130,22 @@ describe("templates interpolated with mood defaults", () => {
   });
 });
 
+describe("deriveSlots v2B", () => {
+  it("emits containerAlign from alignment field", () => {
+    const b = { ...MOOD_DEFAULTS["minimal-precise"], alignment: "centered" as const };
+    const slots = deriveSlots(b);
+    expect(slots.containerAlign).toBe("center");
+  });
+  it("maps 'left' to 'flex-start'", () => {
+    const b = { ...MOOD_DEFAULTS["minimal-precise"], alignment: "left" as const };
+    expect(deriveSlots(b).containerAlign).toBe("flex-start");
+  });
+  it("maps 'split' to 'space-between'", () => {
+    const b = { ...MOOD_DEFAULTS["minimal-precise"], alignment: "split" as const };
+    expect(deriveSlots(b).containerAlign).toBe("space-between");
+  });
+});
+
 describe("StyleBundle v2B new fields", () => {
   it("every mood in MOOD_DEFAULTS has headingScale, bodySize, gap, alignment", () => {
     for (const [moodKey, bundle] of Object.entries(MOOD_DEFAULTS)) {

@@ -224,6 +224,12 @@ function renderIconRow(iconStyle: StyleBundle["iconStyle"]): string {
   return "◆"; // duotone fallback
 }
 
+function deriveContainerAlign(a: StyleBundle["alignment"]): string {
+  if (a === "centered") return "center";
+  if (a === "split") return "space-between";
+  return "flex-start";
+}
+
 export function deriveSlots(
   bundle: StyleBundle,
 ): Record<string, string | number> {
@@ -231,5 +237,6 @@ export function deriveSlots(
     ...bundle,
     buttonTransition: `transform ${bundle.motionDurationMs}ms ${bundle.motionEasing}`,
     iconRow: renderIconRow(bundle.iconStyle),
+    containerAlign: deriveContainerAlign(bundle.alignment),
   };
 }
