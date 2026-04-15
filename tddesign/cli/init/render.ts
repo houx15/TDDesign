@@ -1,10 +1,12 @@
 import { CHOICES, MOODS } from "./choices.js";
+import { OVERALL_STYLE_MOCKUPS } from "./mockups.js";
 
 export function buildIndexHtml(): string {
   const dimensionsJson = JSON.stringify(
     CHOICES.map((d) => ({ dimension: d.dimension, question: d.question }))
   );
   const moodsJson = JSON.stringify(MOODS);
+  const mockupsJson = JSON.stringify(OVERALL_STYLE_MOCKUPS);
 
   return `<!doctype html>
 <html lang="en">
@@ -19,7 +21,7 @@ export function buildIndexHtml(): string {
   p.lead { opacity: 0.7; margin: 0 0 32px; }
   .progress { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 32px; }
   .progress-fill { height: 100%; background: #5B6EE1; border-radius: 2px; transition: width 200ms; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; }
   .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; cursor: pointer; transition: border-color 150ms; }
   .card:hover { border-color: #5B6EE1; }
   .card.selected { border-color: #5B6EE1; background: rgba(91,110,225,0.12); }
@@ -42,6 +44,7 @@ export function buildIndexHtml(): string {
 (function () {
   var DIMENSIONS = ${dimensionsJson};
   var MOODS = ${moodsJson};
+  var OVERALL_STYLE_MOCKUPS = ${mockupsJson};
   var state = { choices: null, step: 0, mood: null, picks: {} };
   var app = document.getElementById('app');
 
@@ -105,8 +108,9 @@ export function buildIndexHtml(): string {
     };
     function cardHtml(opt) {
       var sel = state.picks[dim.dimension] === opt.id ? ' selected' : '';
+      var previewStyle = dim.dimension === 'overall_style' ? 'height:320px' : '';
       return '<div class="card' + sel + '" data-id="' + opt.id + '">' +
-        '<div class="card-preview">' + previewHtml(dim.dimension, opt) + '</div>' +
+        '<div class="card-preview" style="' + previewStyle + '">' + previewHtml(dim.dimension, opt) + '</div>' +
         '<div class="card-label">' + opt.label + '</div>' +
         '<div class="card-tags">' + opt.moodTags.join(', ') + '</div>' +
         '</div>';
@@ -128,6 +132,10 @@ export function buildIndexHtml(): string {
   }
 
   function previewHtml(dimension, opt) {
+    if (dimension === 'overall_style') {
+      if (OVERALL_STYLE_MOCKUPS[opt.id]) return OVERALL_STYLE_MOCKUPS[opt.id];
+      return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
+    }
     var t = opt.tokens || {};
     if (dimension === 'color_direction') {
       return '<div class="swatch-row" style="padding:20px">' +
