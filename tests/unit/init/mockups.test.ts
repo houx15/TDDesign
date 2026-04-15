@@ -16,13 +16,13 @@ describe("overall_style mockups", () => {
 
   it("has one mockup per overall_style option", () => {
     for (const opt of overall.options) {
-      expect(OVERALL_STYLE_MOCKUPS[opt.id]).toBeDefined();
+      expect(OVERALL_STYLE_MOCKUPS.landing[opt.id]).toBeDefined();
     }
   });
 
   it("every mockup uses inline styling (at least one style= attribute)", () => {
     for (const opt of overall.options) {
-      expect(OVERALL_STYLE_MOCKUPS[opt.id]).toMatch(/style=/);
+      expect(OVERALL_STYLE_MOCKUPS.landing[opt.id]).toMatch(/style=/);
     }
   });
 
@@ -37,7 +37,7 @@ describe("overall_style mockups", () => {
 
   it("each mockup contains its canonical headline copy", () => {
     for (const [id, headline] of Object.entries(expectedHeadlines)) {
-      expect(OVERALL_STYLE_MOCKUPS[id]).toContain(headline);
+      expect(OVERALL_STYLE_MOCKUPS.landing[id]).toContain(headline);
     }
   });
 
@@ -108,7 +108,7 @@ describe("templates interpolated with mood defaults", () => {
   it("every template produces no leftover placeholders when interpolated with its mood default", () => {
     for (const opt of overall.options) {
       const out = interpolate(
-        OVERALL_STYLE_MOCKUPS[opt.id],
+        OVERALL_STYLE_MOCKUPS.landing[opt.id],
         deriveSlots(MOOD_DEFAULTS[opt.id]),
       );
       expect(out).not.toMatch(/\{\{\w+\}\}/);
@@ -123,7 +123,7 @@ describe("templates interpolated with mood defaults", () => {
       accent: "#0057FF",
     };
     const out = interpolate(
-      OVERALL_STYLE_MOCKUPS["minimal-precise"],
+      OVERALL_STYLE_MOCKUPS.landing["minimal-precise"],
       deriveSlots(bundle),
     );
     expect(out).toContain("#FFFFFF");
@@ -182,5 +182,56 @@ describe("NEUTRAL_BUNDLE and PAGE_TYPE_PREVIEWS", () => {
 
   it("landing preview contains a figure-role marker", () => {
     expect(PAGE_TYPE_PREVIEWS.landing).toMatch(/data-role=["']figure["']/);
+  });
+});
+
+describe("OVERALL_STYLE_MOCKUPS 2D shape (landing)", () => {
+  it("is keyed by page type at the top level", () => {
+    expect(Object.keys(OVERALL_STYLE_MOCKUPS).sort()).toContain("landing");
+  });
+
+  it("landing column has all 6 moods", () => {
+    const landing = OVERALL_STYLE_MOCKUPS.landing;
+    expect(Object.keys(landing).sort()).toEqual([
+      "brutalist-raw",
+      "editorial-serif",
+      "minimal-precise",
+      "playful-rounded",
+      "vivid-modern",
+      "warm-technical",
+    ]);
+  });
+
+  it("every landing template contains exactly one <h1>", () => {
+    for (const tpl of Object.values(OVERALL_STYLE_MOCKUPS.landing)) {
+      const h1Matches = tpl.match(/<h1[\s>]/g) || [];
+      expect(h1Matches.length).toBe(1);
+    }
+  });
+
+  it("every landing template has a body paragraph of at least 12 words", () => {
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.landing)) {
+      const pMatches = [...tpl.matchAll(/<p[^>]*>([^<]+)<\/p>/g)];
+      const hasLongP = pMatches.some(m => m[1].trim().split(/\s+/).length >= 12);
+      expect(hasLongP, `landing/${mood} missing 12+ word paragraph`).toBe(true);
+    }
+  });
+
+  it("every landing template has a figure-role element", () => {
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.landing)) {
+      const hasFigure = /data-role=["']figure["']/.test(tpl)
+        || /<figure[\s>]/.test(tpl)
+        || /<img[\s>]/.test(tpl);
+      expect(hasFigure, `landing/${mood} missing figure-role element`).toBe(true);
+    }
+  });
+
+  it("every landing template uses core slots", () => {
+    const required = ["{{background}}", "{{text}}", "{{accent}}", "{{fontFamily}}", "{{paddingMin}}", "{{paddingMax}}"];
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.landing)) {
+      for (const slot of required) {
+        expect(tpl, `landing/${mood} missing slot ${slot}`).toContain(slot);
+      }
+    }
   });
 });

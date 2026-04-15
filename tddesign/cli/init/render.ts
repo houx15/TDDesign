@@ -220,7 +220,7 @@ export function buildIndexHtml(): string {
   function previewHtml(dimension, opt) {
     if (dimension === 'overall_style') {
       var bundle = MOOD_DEFAULTS[opt.id];
-      return interpolate(OVERALL_STYLE_MOCKUPS[opt.id], deriveSlots(bundle));
+      return interpolate(OVERALL_STYLE_MOCKUPS.landing[opt.id], deriveSlots(bundle));
     }
     if (!state.mood) {
       return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
@@ -230,7 +230,7 @@ export function buildIndexHtml(): string {
     for (var k in defaults) base[k] = defaults[k];
     if (state.currentStyle) for (var k2 in state.currentStyle) base[k2] = state.currentStyle[k2];
     if (opt.tokens) for (var k3 in opt.tokens) base[k3] = opt.tokens[k3];
-    var tpl = OVERALL_STYLE_MOCKUPS[state.mood];
+    var tpl = OVERALL_STYLE_MOCKUPS.landing[state.mood];
     return interpolate(tpl, deriveSlots(base));
   }
 
@@ -263,7 +263,7 @@ export function buildIndexHtml(): string {
 
   function finalMockup() {
     if (!state.mood || !state.currentStyle) return '';
-    var html = interpolate(OVERALL_STYLE_MOCKUPS[state.mood], deriveSlots(state.currentStyle));
+    var html = interpolate(OVERALL_STYLE_MOCKUPS.landing[state.mood], deriveSlots(state.currentStyle));
     return '<div style="margin-bottom:24px;max-width:480px;height:320px;border-radius:8px;overflow:hidden">' + html + '</div>';
   }
 
