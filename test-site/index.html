@@ -13,7 +13,11 @@
       body {
         margin: 0;
         line-height: 1.5;
+        background: #0F0F10;
+        color: #FAFAFA;
       }
+      .hero { padding: 80px 32px; }
+      .accent { background: #5B6EE1; }
       a { color: inherit; text-decoration: none; }
       h1, h2, h3 { margin: 0; letter-spacing: -0.02em; }
       p { margin: 0; }
@@ -40,7 +44,7 @@
       footer .cols { display: flex; gap: 28px; }
     </style>
   </head>
-  <body class="bg-[#0F0F10] text-[#FAFAFA]">
+  <body>
     <nav>
       <div class="brand">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
@@ -59,12 +63,12 @@
       </div>
     </nav>
 
-    <section class="hero py-20 px-8">
+    <section class="hero">
       <div class="hero-inner">
         <h1>Write less. Ship more.</h1>
         <p>A distraction-free editor for deep work. No distractions. No upsells.</p>
         <div class="cta-row">
-          <a href="#get-started" class="cta bg-[#5B6EE1] px-6 py-3 rounded">Get started</a>
+          <a href="#get-started" class="cta accent px-6 py-3 rounded">Get started</a>
           <a href="#docs" class="cta text-[#5B6EE1]">Read the docs</a>
         </div>
       </div>
