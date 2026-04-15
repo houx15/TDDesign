@@ -23,6 +23,30 @@ export function flatten(html: string): FlatElement[] {
   return out;
 }
 
+export function extractStyleBlockText(html: string): string {
+  const doc = parse(html) as unknown as ParseNode;
+  const chunks: string[] = [];
+  collectStyleText(doc, chunks);
+  return chunks.join("\n");
+}
+
+function collectStyleText(node: ParseNode, chunks: string[]): void {
+  if (node.tagName === "style") {
+    chunks.push(rawTextOf(node));
+    return;
+  }
+  for (const child of node.childNodes ?? []) collectStyleText(child, chunks);
+}
+
+function rawTextOf(node: ParseNode): string {
+  let s = "";
+  for (const child of node.childNodes ?? []) {
+    if (typeof child.value === "string") s += child.value;
+    else s += rawTextOf(child);
+  }
+  return s;
+}
+
 function walk(node: ParseNode, out: FlatElement[]): void {
   if (node.tagName) {
     const attrs = node.attrs ?? [];

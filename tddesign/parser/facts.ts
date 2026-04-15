@@ -1,5 +1,5 @@
 import type { StyleFact } from "../schemas.js";
-import { flatten } from "./html.js";
+import { flatten, extractStyleBlockText } from "./html.js";
 import { resolveTailwindClass } from "./tailwind.js";
 
 function expandShorthand(key: string, value: string): Record<string, string> {
@@ -37,8 +37,45 @@ export function parseInlineStyle(raw: string): Record<string, string> {
   return out;
 }
 
+export interface CssRule {
+  selectors: string[];
+  declarations: Record<string, string>;
+}
+
+const SELECTOR_RE = /^[a-zA-Z#.][\w-]*$/;
+
+export function parseStyleBlock(css: string): CssRule[] {
+  if (!css) return [];
+  const stripped = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const rules: CssRule[] = [];
+  const ruleRe = /([^{}]+)\{([^{}]+)\}/g;
+  let m: RegExpExecArray | null;
+  while ((m = ruleRe.exec(stripped)) !== null) {
+    const selectorList = m[1]
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .filter((s) => SELECTOR_RE.test(s));
+    if (selectorList.length === 0) continue;
+    const declarations = parseInlineStyle(m[2]);
+    if (Object.keys(declarations).length === 0) continue;
+    rules.push({ selectors: selectorList, declarations });
+  }
+  return rules;
+}
+
+function matchesSelector(
+  el: { tag: string; classes: string[]; id?: string },
+  sel: string,
+): boolean {
+  if (sel.startsWith(".")) return el.classes.includes(sel.slice(1));
+  if (sel.startsWith("#")) return el.id === sel.slice(1);
+  return el.tag === sel.toLowerCase();
+}
+
 export function extractFacts(html: string): StyleFact[] {
   const elements = flatten(html);
+  const rules = parseStyleBlock(extractStyleBlockText(html));
 
   return elements.map((el, i) => {
     const resolved: Record<string, string> = {};
@@ -49,7 +86,14 @@ export function extractFacts(html: string): StyleFact[] {
       if (r) resolved[r.property] = r.value;
     }
 
-    // 2. Inline style attribute (highest precedence)
+    // 2. Matched <style> block rules (middle precedence)
+    for (const rule of rules) {
+      if (rule.selectors.some((sel) => matchesSelector(el, sel))) {
+        for (const [k, v] of Object.entries(rule.declarations)) resolved[k] = v;
+      }
+    }
+
+    // 3. Inline style attribute (highest precedence)
     if (el.style) {
       const inline = parseInlineStyle(el.style);
       for (const [k, v] of Object.entries(inline)) resolved[k] = v;
