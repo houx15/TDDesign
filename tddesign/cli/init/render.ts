@@ -1,5 +1,10 @@
-import { CHOICES, MOODS } from "./choices.js";
-import { OVERALL_STYLE_MOCKUPS, MOOD_DEFAULTS } from "./mockups.js";
+import { CHOICES, MOODS, PAGE_TYPE_CHOICE } from "./choices.js";
+import {
+  OVERALL_STYLE_MOCKUPS,
+  MOOD_DEFAULTS,
+  PAGE_TYPE_PREVIEWS,
+  NEUTRAL_BUNDLE,
+} from "./mockups.js";
 
 export function buildIndexHtml(): string {
   const dimensionsJson = JSON.stringify(
@@ -8,6 +13,9 @@ export function buildIndexHtml(): string {
   const moodsJson = JSON.stringify(MOODS);
   const mockupsJson = JSON.stringify(OVERALL_STYLE_MOCKUPS);
   const moodDefaultsJson = JSON.stringify(MOOD_DEFAULTS);
+  const pageTypeChoiceJson = JSON.stringify(PAGE_TYPE_CHOICE);
+  const pageTypePreviewsJson = JSON.stringify(PAGE_TYPE_PREVIEWS);
+  const neutralBundleJson = JSON.stringify(NEUTRAL_BUNDLE);
 
   return `<!doctype html>
 <html lang="en">
@@ -47,8 +55,11 @@ export function buildIndexHtml(): string {
   var MOODS = ${moodsJson};
   var OVERALL_STYLE_MOCKUPS = ${mockupsJson};
   var MOOD_DEFAULTS = ${moodDefaultsJson};
+  var PAGE_TYPE_CHOICE = ${pageTypeChoiceJson};
+  var PAGE_TYPE_PREVIEWS = ${pageTypePreviewsJson};
+  var NEUTRAL_BUNDLE = ${neutralBundleJson};
   var DIM_ORDER = ["color_direction","typography","component_style","layout_spacing","detail_elements","motion"];
-  var state = { choices: null, step: 0, mood: null, picks: {}, currentStyle: null, customTokens: {} };
+  var state = { choices: null, step: 0, pageType: null, mood: null, picks: {}, currentStyle: null, customTokens: {} };
 
   function interpolate(tpl, slots) {
     return tpl.replace(/\\{\\{(\\w+)\\}\\}/g, function (_, k) {
@@ -61,11 +72,17 @@ export function buildIndexHtml(): string {
     if (iconStyle === 'emoji') return '\uD83D\uDE80';
     return '\u25C6';
   }
+  function deriveContainerAlign(a) {
+    if (a === 'centered') return 'center';
+    if (a === 'split') return 'space-between';
+    return 'flex-start';
+  }
   function deriveSlots(b) {
     var s = {};
     for (var k in b) s[k] = b[k];
     s.buttonTransition = 'transform ' + b.motionDurationMs + 'ms ' + b.motionEasing;
     s.iconRow = renderIconRow(b.iconStyle);
+    s.containerAlign = deriveContainerAlign(b.alignment);
     return s;
   }
   function findOption(dimName, id) {
@@ -110,10 +127,42 @@ export function buildIndexHtml(): string {
 
   function render() {
     if (!state.choices) { app.textContent = 'loading…'; return; }
-    var totalSteps = 1 + state.choices.length + 1;
+    var totalSteps = 2 + state.choices.length + 1;
     if (state.step === 0) return renderWelcome(totalSteps);
-    if (state.step <= state.choices.length) return renderDimension(state.step - 1, totalSteps);
+    if (state.step === 1) return renderPageType(totalSteps);
+    if (state.step <= state.choices.length + 1) return renderDimension(state.step - 2, totalSteps);
     return renderReview(totalSteps);
+  }
+
+  function renderPageType(total) {
+    var html =
+      progressBar(1, total) +
+      '<h1>' + PAGE_TYPE_CHOICE.question + '</h1>' +
+      '<p class="lead">Step 1 of ' + (state.choices.length + 1) + '</p>';
+    html += '<div class="grid">' + PAGE_TYPE_CHOICE.options.map(function (opt) {
+      var sel = state.pageType === opt.id ? ' selected' : '';
+      var preview = interpolate(PAGE_TYPE_PREVIEWS[opt.id], deriveSlots(NEUTRAL_BUNDLE));
+      return '<div class="card' + sel + '" data-id="' + opt.id + '">' +
+        '<div class="card-preview" style="height:320px">' + preview + '</div>' +
+        '<div class="card-label">' + opt.label + '</div>' +
+        '</div>';
+    }).join('') + '</div>';
+    html += '<div style="margin-top:32px"><button class="ghost" id="back">Back</button><button class="primary" id="next">Next</button></div>';
+    app.innerHTML = html;
+    var cards = app.querySelectorAll('.card');
+    cards.forEach(function (c) {
+      var id = c.getAttribute('data-id');
+      c.onclick = function () {
+        state.pageType = id;
+        render();
+      };
+    });
+    document.getElementById('back').onclick = function () { state.step = 0; render(); };
+    document.getElementById('next').onclick = function () {
+      if (!state.pageType) return;
+      state.step = 2;
+      render();
+    };
   }
 
   function progressBar(step, total) {
@@ -140,9 +189,9 @@ export function buildIndexHtml(): string {
       (state.mood && opt.moodTags.indexOf(state.mood) >= 0 ? recommended : others).push(opt);
     }
     var html =
-      progressBar(idx + 1, total) +
+      progressBar(idx + 2, total) +
       '<h1>' + dim.question + '</h1>' +
-      '<p class="lead">Step ' + (idx + 1) + ' of ' + state.choices.length + '</p>';
+      '<p class="lead">Step ' + (idx + 2) + ' of ' + (state.choices.length + 1) + '</p>';
     if (state.mood && recommended.length) {
       html += '<div class="group-heading">Recommended for ' + state.mood + '</div>';
       html += '<div class="grid">' + recommended.map(cardHtml).join('') + '</div>';
@@ -218,11 +267,16 @@ export function buildIndexHtml(): string {
   }
 
   function previewHtml(dimension, opt) {
-    if (dimension === 'overall_style') {
-      var bundle = MOOD_DEFAULTS[opt.id];
-      return interpolate(OVERALL_STYLE_MOCKUPS.landing[opt.id], deriveSlots(bundle));
+    if (dimension === 'page_type') {
+      return interpolate(PAGE_TYPE_PREVIEWS[opt.id], deriveSlots(NEUTRAL_BUNDLE));
     }
-    if (!state.mood) {
+    if (dimension === 'overall_style') {
+      if (!state.pageType) return '';
+      var tpl0 = OVERALL_STYLE_MOCKUPS[state.pageType][opt.id];
+      if (!tpl0) return '';
+      return interpolate(tpl0, deriveSlots(MOOD_DEFAULTS[opt.id]));
+    }
+    if (!state.pageType || !state.mood) {
       return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
     }
     var base = {};
@@ -230,7 +284,7 @@ export function buildIndexHtml(): string {
     for (var k in defaults) base[k] = defaults[k];
     if (state.currentStyle) for (var k2 in state.currentStyle) base[k2] = state.currentStyle[k2];
     if (opt.tokens) for (var k3 in opt.tokens) base[k3] = opt.tokens[k3];
-    var tpl = OVERALL_STYLE_MOCKUPS.landing[state.mood];
+    var tpl = OVERALL_STYLE_MOCKUPS[state.pageType][state.mood];
     return interpolate(tpl, deriveSlots(base));
   }
 
@@ -242,7 +296,7 @@ export function buildIndexHtml(): string {
       return '<div class="review-row">' +
         '<div>' + d.dimension + '</div>' +
         '<div>' + opt.label + (drift ? ' <span style="opacity:0.6">(off-mood)</span>' : '') + '</div>' +
-        '<a class="edit" href="#" data-step="' + (state.choices.indexOf(d) + 1) + '">Edit</a>' +
+        '<a class="edit" href="#" data-step="' + (state.choices.indexOf(d) + 2) + '">Edit</a>' +
         '</div>';
     }).join('');
     app.innerHTML =
@@ -262,13 +316,15 @@ export function buildIndexHtml(): string {
   }
 
   function finalMockup() {
-    if (!state.mood || !state.currentStyle) return '';
-    var html = interpolate(OVERALL_STYLE_MOCKUPS.landing[state.mood], deriveSlots(state.currentStyle));
+    if (!state.pageType || !state.mood || !state.currentStyle) return '';
+    var tpl = OVERALL_STYLE_MOCKUPS[state.pageType] && OVERALL_STYLE_MOCKUPS[state.pageType][state.mood];
+    if (!tpl) return '';
+    var html = interpolate(tpl, deriveSlots(state.currentStyle));
     return '<div style="margin-bottom:24px;max-width:480px;height:320px;border-radius:8px;overflow:hidden">' + html + '</div>';
   }
 
   function submit() {
-    var body = { mood: state.mood, picks: state.picks };
+    var body = { pageType: state.pageType, mood: state.mood, picks: state.picks };
     if (state.picks.color_direction === 'custom' && state.customTokens.color_direction) {
       body.customTokens = state.customTokens;
     }

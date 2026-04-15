@@ -60,3 +60,25 @@ describe("render.buildIndexHtml", () => {
     }
   });
 });
+
+describe("render v2B Q0", () => {
+  it("includes the page_type question label in the SPA HTML", () => {
+    const html = buildIndexHtml();
+    expect(html).toContain("What kind of page are you designing");
+  });
+
+  it("inline client initializes state.pageType to null", () => {
+    const html = buildIndexHtml();
+    expect(html).toMatch(/pageType\s*:\s*null/);
+  });
+
+  it("inline client has a 2D OVERALL_STYLE_MOCKUPS lookup", () => {
+    const html = buildIndexHtml();
+    expect(html).toMatch(/OVERALL_STYLE_MOCKUPS\[[^\]]+\]\[[^\]]+\]/);
+  });
+
+  it("inline client defines deriveContainerAlign", () => {
+    const html = buildIndexHtml();
+    expect(html).toContain("deriveContainerAlign");
+  });
+});
