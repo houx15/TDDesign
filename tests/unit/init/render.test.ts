@@ -38,4 +38,14 @@ describe("render.buildIndexHtml", () => {
       expect(html).toContain(m);
     }
   });
+
+  it("embeds OVERALL_STYLE_MOCKUPS so the client can render the review mockup", () => {
+    const overall = CHOICES.find((c) => c.dimension === "overall_style")!;
+    for (const opt of overall.options) {
+      // Each mood id appears at least twice: once as a CHOICES option id
+      // and once as an OVERALL_STYLE_MOCKUPS key.
+      const matches = html.split(opt.id).length - 1;
+      expect(matches).toBeGreaterThanOrEqual(2);
+    }
+  });
 });

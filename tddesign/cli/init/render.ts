@@ -210,6 +210,7 @@ export function buildIndexHtml(): string {
       progressBar(total - 1, total) +
       '<h1>Review</h1>' +
       '<p class="lead">Confirm your 7 picks, then write the file.</p>' +
+      finalMockup() +
       rows +
       '<div style="margin-top:24px"><button class="ghost" id="back">Back</button><button class="primary" id="submit">Write preference_vector.json</button></div>' +
       '<div id="msg"></div>';
@@ -219,6 +220,12 @@ export function buildIndexHtml(): string {
     });
     document.getElementById('back').onclick = function () { state.step--; render(); };
     document.getElementById('submit').onclick = submit;
+  }
+
+  function finalMockup() {
+    if (!state.mood || !state.currentStyle) return '';
+    var html = interpolate(OVERALL_STYLE_MOCKUPS[state.mood], deriveSlots(state.currentStyle));
+    return '<div style="margin-bottom:24px;max-width:480px;height:320px;border-radius:8px;overflow:hidden">' + html + '</div>';
   }
 
   function submit() {
