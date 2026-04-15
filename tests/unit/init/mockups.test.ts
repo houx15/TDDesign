@@ -235,3 +235,47 @@ describe("OVERALL_STYLE_MOCKUPS 2D shape (landing)", () => {
     }
   });
 });
+
+describe("OVERALL_STYLE_MOCKUPS dashboard column", () => {
+  it("has all 6 moods", () => {
+    expect(Object.keys(OVERALL_STYLE_MOCKUPS.dashboard || {}).sort()).toEqual([
+      "brutalist-raw",
+      "editorial-serif",
+      "minimal-precise",
+      "playful-rounded",
+      "vivid-modern",
+      "warm-technical",
+    ]);
+  });
+
+  it("every dashboard template contains exactly one <h1>", () => {
+    for (const tpl of Object.values(OVERALL_STYLE_MOCKUPS.dashboard)) {
+      const h1Matches = tpl.match(/<h1[\s>]/g) || [];
+      expect(h1Matches.length).toBe(1);
+    }
+  });
+
+  it("every dashboard template has a body paragraph of at least 12 words", () => {
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.dashboard)) {
+      const pMatches = [...tpl.matchAll(/<p[^>]*>([^<]+)<\/p>/g)];
+      const hasLongP = pMatches.some(m => m[1].trim().split(/\s+/).length >= 12);
+      expect(hasLongP, `dashboard/${mood} missing 12+ word paragraph`).toBe(true);
+    }
+  });
+
+  it("every dashboard template has at least 3 KPI-role cells", () => {
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.dashboard)) {
+      const kpiMatches = tpl.match(/data-role=["']kpi["']/g) || [];
+      expect(kpiMatches.length, `dashboard/${mood} KPI count`).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("every dashboard template uses core slots", () => {
+    const required = ["{{background}}", "{{text}}", "{{accent}}", "{{fontFamily}}"];
+    for (const [mood, tpl] of Object.entries(OVERALL_STYLE_MOCKUPS.dashboard)) {
+      for (const slot of required) {
+        expect(tpl, `dashboard/${mood} missing slot ${slot}`).toContain(slot);
+      }
+    }
+  });
+});
