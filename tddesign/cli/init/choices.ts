@@ -55,28 +55,47 @@ const COLOR_OPTIONS: ChoiceOption[] = [
   { id: "violet-haze",    label: "Violet Haze",      moodTags: ["vivid-modern", "playful"],     sourceRefs: ["vercel"], tokens: { background: "#1B1033", text: "#F3E8FF", accent: "#A855F7" }, notesTemplate: "Background #1B1033, primary text #F3E8FF, accent #A855F7", render: "color" },
 ];
 
-const STUB_TYPOGRAPHY: ChoiceOption = {
-  id: "stub", label: "stub", moodTags: ["minimal"], sourceRefs: [], tokens: {}, notesTemplate: "", render: "type",
-};
-const STUB_COMPONENT: ChoiceOption = {
-  id: "stub", label: "stub", moodTags: ["minimal"], sourceRefs: [], tokens: {}, notesTemplate: "", render: "component",
-};
-const STUB_LAYOUT: ChoiceOption = {
-  id: "stub", label: "stub", moodTags: ["minimal"], sourceRefs: [], tokens: {}, notesTemplate: "", render: "layout",
-};
-const STUB_DETAIL: ChoiceOption = {
-  id: "stub", label: "stub", moodTags: ["minimal"], sourceRefs: [], tokens: {}, notesTemplate: "", render: "detail",
-};
-const STUB_MOTION: ChoiceOption = {
-  id: "stub", label: "stub", moodTags: ["minimal"], sourceRefs: [], tokens: {}, notesTemplate: "", render: "motion",
-};
+const TYPOGRAPHY_OPTIONS: ChoiceOption[] = [
+  { id: "geometric-sans",   label: "Geometric Sans",   moodTags: ["minimal", "warm-technical"],   sourceRefs: ["vercel"], tokens: { family: "Inter, system-ui, sans-serif" },           notesTemplate: "Inter geometric sans",         render: "type" },
+  { id: "humanist-sans",    label: "Humanist Sans",    moodTags: ["warm-technical", "editorial"], sourceRefs: ["stripe"], tokens: { family: "'Source Sans 3', system-ui, sans-serif" }, notesTemplate: "Source Sans humanist",         render: "type" },
+  { id: "editorial-serif",  label: "Editorial Serif",  moodTags: ["editorial"],                   sourceRefs: ["stripe"], tokens: { family: "Georgia, 'Times New Roman', serif" },       notesTemplate: "Georgia serif editorial",      render: "type" },
+  { id: "mono-technical",   label: "Mono Technical",   moodTags: ["brutalist", "warm-technical"], sourceRefs: ["linear"], tokens: { family: "'JetBrains Mono', ui-monospace, monospace" }, notesTemplate: "JetBrains Mono monospace",   render: "type" },
+];
+
+const COMPONENT_OPTIONS: ChoiceOption[] = [
+  { id: "subtle-radius-minimal-shadow", label: "Subtle Radius, Minimal Shadow", moodTags: ["minimal", "warm-technical"], sourceRefs: ["linear"], tokens: { radius: 6, shadow: "0 1px 2px rgba(0,0,0,0.06)" },             notesTemplate: "subtle radius minimal shadow", render: "component" },
+  { id: "sharp-flat",                   label: "Sharp Flat",                    moodTags: ["brutalist", "editorial"],    sourceRefs: ["linear"], tokens: { radius: 0, shadow: "none" },                                    notesTemplate: "sharp flat no shadow",          render: "component" },
+  { id: "soft-pillowy",                 label: "Soft Pillowy",                  moodTags: ["playful", "vivid-modern"],   sourceRefs: ["vercel"], tokens: { radius: 16, shadow: "0 8px 24px rgba(0,0,0,0.12)" },            notesTemplate: "soft pillowy generous shadow",  render: "component" },
+  { id: "bordered-flat",                label: "Bordered Flat",                 moodTags: ["editorial", "minimal"],      sourceRefs: ["stripe"], tokens: { radius: 4, shadow: "none", border: "1px solid currentColor" },  notesTemplate: "bordered flat hairline",        render: "component" },
+];
+
+const LAYOUT_OPTIONS: ChoiceOption[] = [
+  { id: "spacious-hero",     label: "Spacious Hero",     moodTags: ["minimal", "editorial"],        sourceRefs: ["stripe"], tokens: { paddingMin: 48, paddingMax: 96 },  notesTemplate: "Section padding between 48 and 96 px",   render: "layout" },
+  { id: "compact-dense",     label: "Compact Dense",     moodTags: ["warm-technical", "brutalist"], sourceRefs: ["linear"], tokens: { paddingMin: 16, paddingMax: 32 },  notesTemplate: "Section padding between 16 and 32 px",   render: "layout" },
+  { id: "medium-breath",     label: "Medium Breath",     moodTags: ["warm-technical", "playful"],   sourceRefs: ["vercel"], tokens: { paddingMin: 32, paddingMax: 64 },  notesTemplate: "Section padding between 32 and 64 px",   render: "layout" },
+  { id: "editorial-margins", label: "Editorial Margins", moodTags: ["editorial"],                   sourceRefs: ["stripe"], tokens: { paddingMin: 64, paddingMax: 128 }, notesTemplate: "Section padding between 64 and 128 px",  render: "layout" },
+];
+
+const DETAIL_OPTIONS: ChoiceOption[] = [
+  { id: "line-icons-no-emoji",    label: "Line Icons, No Emoji",    moodTags: ["minimal", "warm-technical", "editorial"], sourceRefs: ["linear"], tokens: { iconStyle: "line" },    notesTemplate: "No emoji characters anywhere",    render: "detail" },
+  { id: "filled-icons-no-emoji",  label: "Filled Icons, No Emoji",  moodTags: ["brutalist", "vivid-modern"],              sourceRefs: ["vercel"], tokens: { iconStyle: "filled" },  notesTemplate: "No emoji characters anywhere",    render: "detail" },
+  { id: "emoji-welcome",          label: "Emoji Welcome",           moodTags: ["playful"],                                sourceRefs: ["vercel"], tokens: { iconStyle: "emoji" },   notesTemplate: "Emoji allowed as accent elements", render: "detail" },
+  { id: "duotone-icons-no-emoji", label: "Duotone Icons, No Emoji", moodTags: ["editorial", "warm-technical"],            sourceRefs: ["stripe"], tokens: { iconStyle: "duotone" }, notesTemplate: "No emoji characters anywhere",    render: "detail" },
+];
+
+const MOTION_OPTIONS: ChoiceOption[] = [
+  { id: "subtle-fast",     label: "Subtle Fast",     moodTags: ["minimal", "warm-technical"], sourceRefs: ["vercel"], tokens: { durationMs: 150, easing: "ease-out" },                         notesTemplate: "subtle fast motion",      render: "motion" },
+  { id: "considered-slow", label: "Considered Slow", moodTags: ["editorial"],                 sourceRefs: ["stripe"], tokens: { durationMs: 400, easing: "ease-in-out" },                      notesTemplate: "considered slow motion",  render: "motion" },
+  { id: "snappy-springy",  label: "Snappy Springy",  moodTags: ["playful", "vivid-modern"],   sourceRefs: ["vercel"], tokens: { durationMs: 220, easing: "cubic-bezier(0.34,1.56,0.64,1)" },   notesTemplate: "snappy springy motion",   render: "motion" },
+  { id: "none-static",     label: "None, Static",    moodTags: ["brutalist"],                 sourceRefs: ["linear"], tokens: { durationMs: 0, easing: "linear" },                             notesTemplate: "no motion static",        render: "motion" },
+];
 
 export const CHOICES: DimensionChoices[] = [
   { dimension: "overall_style",   question: "Pick a mood.",              options: OVERALL_STYLE_OPTIONS },
   { dimension: "color_direction", question: "Pick a palette.",           options: COLOR_OPTIONS },
-  { dimension: "typography",      question: "Pick a typographic voice.", options: [STUB_TYPOGRAPHY] },
-  { dimension: "component_style", question: "Pick a component style.",   options: [STUB_COMPONENT] },
-  { dimension: "layout_spacing",  question: "Pick a spacing feel.",      options: [STUB_LAYOUT] },
-  { dimension: "detail_elements", question: "Pick detail treatment.",    options: [STUB_DETAIL] },
-  { dimension: "motion",          question: "Pick a motion feel.",       options: [STUB_MOTION] },
+  { dimension: "typography",      question: "Pick a typographic voice.", options: TYPOGRAPHY_OPTIONS },
+  { dimension: "component_style", question: "Pick a component style.",   options: COMPONENT_OPTIONS },
+  { dimension: "layout_spacing",  question: "Pick a spacing feel.",      options: LAYOUT_OPTIONS },
+  { dimension: "detail_elements", question: "Pick detail treatment.",    options: DETAIL_OPTIONS },
+  { dimension: "motion",          question: "Pick a motion feel.",       options: MOTION_OPTIONS },
 ];

@@ -80,3 +80,64 @@ describe("choices round-trip", () => {
     }
   });
 });
+
+describe("all dimensions populated", () => {
+  const minCounts: Record<string, number> = {
+    overall_style: 6,
+    color_direction: 6,
+    typography: 4,
+    component_style: 4,
+    layout_spacing: 4,
+    detail_elements: 4,
+    motion: 4,
+  };
+
+  it("meets minimum option counts per dimension", () => {
+    for (const d of CHOICES) {
+      expect(d.options.length).toBeGreaterThanOrEqual(minCounts[d.dimension]);
+    }
+  });
+
+  it("every option has at least one mood tag", () => {
+    for (const d of CHOICES) {
+      for (const opt of d.options) {
+        expect(opt.moodTags.length).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it("every option id is unique within its dimension", () => {
+    for (const d of CHOICES) {
+      const ids = d.options.map((o) => o.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+
+  it("picking the first option of every dimension round-trips through parser", () => {
+    const picks = Object.fromEntries(
+      CHOICES.map((d) => [d.dimension, d.options[0].id])
+    );
+    const v = vectorFromPicks(picks);
+    expect(() => parsePreferenceVector(v)).not.toThrow();
+    const checks = parsePreferenceVector(v);
+    expect(checks.length).toBeGreaterThan(0);
+  });
+
+  it("layout_spacing emits a range check with valid min/max", () => {
+    const layout = CHOICES.find((c) => c.dimension === "layout_spacing")!;
+    for (const opt of layout.options) {
+      const v = vectorFromPicks({ layout_spacing: opt.id });
+      const ranges = parsePreferenceVector(v).filter((c) => c.type === "range");
+      expect(ranges.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("detail_elements option with 'no-emoji' id emits pattern-absent check", () => {
+    const details = CHOICES.find((c) => c.dimension === "detail_elements")!;
+    const noEmoji = details.options.find((o) => o.id.includes("no-emoji"));
+    expect(noEmoji).toBeDefined();
+    const v = vectorFromPicks({ detail_elements: noEmoji!.id });
+    const patterns = parsePreferenceVector(v).filter((c) => c.type === "pattern");
+    expect(patterns.length).toBeGreaterThanOrEqual(1);
+  });
+});
