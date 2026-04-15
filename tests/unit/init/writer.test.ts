@@ -35,6 +35,44 @@ describe("writer.assembleVector", () => {
     expect(v.created_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(v.updated_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
+
+  it("custom color_direction synthesizes notes from customTokens", () => {
+    const picks = firstPicks();
+    picks.color_direction = "custom";
+    const v = assembleVector({
+      mood: "minimal",
+      picks: picks as any,
+      customTokens: {
+        color_direction: { background: "#112233", text: "#EEDDCC", accent: "#FF8800" },
+      },
+    });
+    expect(v.selections.color_direction.choice).toBe("custom");
+    expect(v.selections.color_direction.notes).toBe(
+      "Background #112233, primary text #EEDDCC, accent #FF8800"
+    );
+    expect(v.selections.color_direction.source_refs).toEqual(["custom"]);
+  });
+
+  it("custom color_direction without customTokens falls back to option placeholder", () => {
+    const picks = firstPicks();
+    picks.color_direction = "custom";
+    const v = assembleVector({ mood: "minimal", picks: picks as any });
+    expect(v.selections.color_direction.notes).toContain("#000000");
+  });
+
+  it("custom color_direction rejects invalid hex", () => {
+    const picks = firstPicks();
+    picks.color_direction = "custom";
+    expect(() =>
+      assembleVector({
+        mood: "minimal",
+        picks: picks as any,
+        customTokens: {
+          color_direction: { background: "not-a-hex", text: "#FFFFFF", accent: "#000000" },
+        },
+      })
+    ).toThrow(/invalid custom hex/i);
+  });
 });
 
 describe("writer.writeVector", () => {

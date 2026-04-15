@@ -13,7 +13,12 @@ export interface SubmitPayload {
     detail_elements: string;
     motion: string;
   };
+  customTokens?: {
+    color_direction?: { background: string; text: string; accent: string };
+  };
 }
+
+const HEX_RE = /^#[0-9A-Fa-f]{6}$/;
 
 export function assembleVector(payload: SubmitPayload): PreferenceVector {
   const now = new Date().toISOString();
@@ -27,10 +32,26 @@ export function assembleVector(payload: SubmitPayload): PreferenceVector {
         `unknown option '${chosenId}' for dimension '${dim.dimension}'`
       );
     }
+    let sourceRefs = opt.sourceRefs;
+    let notes = opt.notesTemplate;
+    if (
+      dim.dimension === "color_direction" &&
+      chosenId === "custom" &&
+      payload.customTokens?.color_direction
+    ) {
+      const t = payload.customTokens.color_direction;
+      for (const v of [t.background, t.text, t.accent]) {
+        if (!HEX_RE.test(v)) {
+          throw new Error(`invalid custom hex: ${v}`);
+        }
+      }
+      sourceRefs = ["custom"];
+      notes = `Background ${t.background}, primary text ${t.text}, accent ${t.accent}`;
+    }
     selections[dim.dimension] = {
       choice: opt.id,
-      source_refs: opt.sourceRefs,
-      notes: opt.notesTemplate,
+      source_refs: sourceRefs,
+      notes,
     };
   }
 

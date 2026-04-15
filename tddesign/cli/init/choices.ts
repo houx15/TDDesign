@@ -57,6 +57,7 @@ const COLOR_OPTIONS: ChoiceOption[] = [
   { id: "ocean-mist",    label: "Ocean Mist",    moodTags: ["editorial", "warm-technical"],            sourceRefs: ["custom"], tokens: { background: "#E8F4F8", text: "#0A2740", accent: "#00A3B4" }, notesTemplate: "Background #E8F4F8, primary text #0A2740, accent #00A3B4", render: "color" },
   { id: "rose-graphite", label: "Rose on Graphite", moodTags: ["vivid-modern", "minimal", "playful"], sourceRefs: ["custom"], tokens: { background: "#1F1D1D", text: "#F5EBEB", accent: "#E85D75" }, notesTemplate: "Background #1F1D1D, primary text #F5EBEB, accent #E85D75", render: "color" },
   { id: "emerald-ivory", label: "Emerald on Ivory", moodTags: ["editorial", "minimal"],                sourceRefs: ["custom"], tokens: { background: "#FDFCF3", text: "#0F2E1B", accent: "#0A7B3E" }, notesTemplate: "Background #FDFCF3, primary text #0F2E1B, accent #0A7B3E", render: "color" },
+  { id: "custom", label: "Custom colors…", moodTags: ["minimal","editorial","playful","brutalist","warm-technical","vivid-modern"], sourceRefs: ["custom"], tokens: { background: "#000000", text: "#FFFFFF", accent: "#888888" }, notesTemplate: "Background #000000, primary text #FFFFFF, accent #888888", render: "color" },
 ];
 
 const TYPOGRAPHY_OPTIONS: ChoiceOption[] = [
