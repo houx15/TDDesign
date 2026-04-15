@@ -240,3 +240,57 @@ export function deriveSlots(
     containerAlign: deriveContainerAlign(bundle.alignment),
   };
 }
+
+export const NEUTRAL_BUNDLE: StyleBundle = {
+  background: "#F7F7F8",
+  text: "#1A1A1A",
+  accent: "#3B82F6",
+  fontFamily: "Inter, system-ui, sans-serif",
+  radius: 6,
+  shadow: "0 1px 2px rgba(0,0,0,0.06)",
+  border: "none",
+  paddingMin: 32,
+  paddingMax: 48,
+  iconStyle: "line",
+  motionDurationMs: 150,
+  motionEasing: "ease-out",
+  mood: "neutral",
+  headingScale: 24,
+  bodySize: 13,
+  gap: 20,
+  alignment: "left",
+};
+
+export const PAGE_TYPE_PREVIEWS: Record<string, string> = {
+  landing: [
+    '<div style="width:100%;height:100%;background:{{background}};color:{{text}};display:flex;flex-direction:column;padding:{{paddingMin}}px {{paddingMax}}px;box-sizing:border-box;font-family:{{fontFamily}};gap:{{gap}}px">',
+    '<div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.5">LANDING PAGE</div>',
+    '<h1 style="font-size:{{headingScale}}px;font-weight:600;margin:0;line-height:1.1">A marketing hero that sells the product.</h1>',
+    '<p style="font-size:{{bodySize}}px;opacity:0.7;margin:0;max-width:60%">Headline, subheadline, a primary call-to-action, a product figure, and a row of feature callouts underneath.</p>',
+    '<div style="display:flex;gap:12px;align-items:center">',
+    '<button style="background:{{accent}};color:#fff;border:none;border-radius:{{radius}}px;padding:8px 16px;font-size:12px;font-family:inherit;cursor:pointer">Get started →</button>',
+    '<span style="font-size:11px;opacity:0.6">or see examples</span>',
+    "</div>",
+    '<div data-role="figure" style="flex:1;min-height:60px;background:rgba(0,0,0,0.05);border-radius:{{radius}}px;display:flex;align-items:center;justify-content:center;font-size:10px;opacity:0.4">[ product figure ]</div>',
+    "</div>",
+  ].join(""),
+
+  dashboard: [
+    '<div style="width:100%;height:100%;background:{{background}};color:{{text}};display:flex;flex-direction:column;box-sizing:border-box;font-family:{{fontFamily}}">',
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(0,0,0,0.08)">',
+    '<div style="font-size:13px;font-weight:600">◆ Dashboard</div>',
+    '<div style="font-size:11px;opacity:0.6">houyuxin@local</div>',
+    "</div>",
+    '<div style="padding:16px 20px;display:flex;flex-direction:column;gap:{{gap}}px;flex:1">',
+    '<h1 style="font-size:{{headingScale}}px;font-weight:600;margin:0">Q2 performance overview</h1>',
+    '<p style="font-size:{{bodySize}}px;opacity:0.7;margin:0">Top-line metrics, a trend chart, and a transaction table below for daily review.</p>',
+    '<div data-role="kpi" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">',
+    '<div style="border:1px solid rgba(0,0,0,0.1);border-radius:{{radius}}px;padding:10px"><div style="font-size:10px;opacity:0.6">Revenue</div><div style="font-size:18px;font-weight:600">$48.2k</div></div>',
+    '<div style="border:1px solid rgba(0,0,0,0.1);border-radius:{{radius}}px;padding:10px"><div style="font-size:10px;opacity:0.6">Active</div><div style="font-size:18px;font-weight:600">1,204</div></div>',
+    '<div style="border:1px solid rgba(0,0,0,0.1);border-radius:{{radius}}px;padding:10px"><div style="font-size:10px;opacity:0.6">Churn</div><div style="font-size:18px;font-weight:600">2.3%</div></div>',
+    "</div>",
+    '<div style="flex:1;background:rgba(0,0,0,0.04);border-radius:{{radius}}px;min-height:40px;display:flex;align-items:center;justify-content:center;font-size:10px;opacity:0.4">[ chart area ]</div>',
+    "</div>",
+    "</div>",
+  ].join(""),
+};

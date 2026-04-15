@@ -4,6 +4,8 @@ import {
   MOOD_DEFAULTS,
   interpolate,
   deriveSlots,
+  NEUTRAL_BUNDLE,
+  PAGE_TYPE_PREVIEWS,
   type StyleBundle,
 } from "../../../tddesign/cli/init/mockups.js";
 import { CHOICES } from "../../../tddesign/cli/init/choices.js";
@@ -154,5 +156,31 @@ describe("StyleBundle v2B new fields", () => {
       expect(typeof bundle.gap).toBe("number");
       expect(["centered", "left", "split"]).toContain(bundle.alignment);
     }
+  });
+});
+
+describe("NEUTRAL_BUNDLE and PAGE_TYPE_PREVIEWS", () => {
+  it("NEUTRAL_BUNDLE is a full StyleBundle", () => {
+    expect(NEUTRAL_BUNDLE.background).toBeDefined();
+    expect(NEUTRAL_BUNDLE.headingScale).toBeTypeOf("number");
+    expect(["centered", "left", "split"]).toContain(NEUTRAL_BUNDLE.alignment);
+  });
+
+  it("PAGE_TYPE_PREVIEWS has exactly 2 entries: landing and dashboard", () => {
+    expect(Object.keys(PAGE_TYPE_PREVIEWS).sort()).toEqual(["dashboard", "landing"]);
+  });
+
+  it("every page-type preview contains an <h1>", () => {
+    for (const tpl of Object.values(PAGE_TYPE_PREVIEWS)) {
+      expect(tpl).toMatch(/<h1[\s>]/);
+    }
+  });
+
+  it("dashboard preview contains a KPI-row marker (data-role=\"kpi\" or equivalent)", () => {
+    expect(PAGE_TYPE_PREVIEWS.dashboard).toMatch(/data-role=["']kpi["']/);
+  });
+
+  it("landing preview contains a figure-role marker", () => {
+    expect(PAGE_TYPE_PREVIEWS.landing).toMatch(/data-role=["']figure["']/);
   });
 });
