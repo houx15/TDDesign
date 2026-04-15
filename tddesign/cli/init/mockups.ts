@@ -126,7 +126,8 @@ export const OVERALL_STYLE_MOCKUPS: Record<string, string> = {
     '<div style="width:100%;height:100%;background:{{background}};color:{{text}};padding:48px 32px 32px 25%;box-sizing:border-box;font-family:{{fontFamily}}">',
     '<div style="font-family:Inter,system-ui,sans-serif;font-size:11px;letter-spacing:0.18em;color:{{accent}};margin-bottom:24px;text-transform:uppercase">ISSUE 14 &middot; APRIL</div>',
     '<h1 style="font-family:{{fontFamily}};font-size:32px;font-style:italic;font-weight:400;line-height:1.15;margin:0 0 20px">The quiet renaissance of slow software.</h1>',
-    '<p style="font-family:{{fontFamily}};font-size:14px;font-style:italic;opacity:0.6;line-height:1.5;margin:0">Craft, rhythm, and the things we lose when everything is optimized for speed.</p>',
+    '<p style="font-family:{{fontFamily}};font-size:14px;font-style:italic;opacity:0.6;line-height:1.5;margin:0 0 24px">Craft, rhythm, and the things we lose when everything is optimized for speed.</p>',
+    '<button style="background:transparent;color:{{accent}};border:1px solid {{accent}};border-radius:{{radius}}px;padding:8px 14px;font-family:Inter,system-ui,sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;box-shadow:{{shadow}};transition:{{buttonTransition}}">Read the essay {{iconRow}}</button>',
     "</div>",
   ].join(""),
 
