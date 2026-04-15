@@ -1,6 +1,205 @@
-import { CHOICES } from "./choices.js";
+import { CHOICES, MOODS } from "./choices.js";
 
 export function buildIndexHtml(): string {
-  const questions = CHOICES.map((d) => `<section>${d.question}</section>`).join("\n");
-  return `<!doctype html><html><head><meta charset="utf-8"><title>taste init</title></head><body>${questions}</body></html>`;
+  const dimensionsJson = JSON.stringify(
+    CHOICES.map((d) => ({ dimension: d.dimension, question: d.question }))
+  );
+  const moodsJson = JSON.stringify(MOODS);
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>taste init</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; background: #0F0F10; color: #FAFAFA; }
+  main { max-width: 960px; margin: 0 auto; padding: 48px 24px; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  p.lead { opacity: 0.7; margin: 0 0 32px; }
+  .progress { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 32px; }
+  .progress-fill { height: 100%; background: #5B6EE1; border-radius: 2px; transition: width 200ms; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; cursor: pointer; transition: border-color 150ms; }
+  .card:hover { border-color: #5B6EE1; }
+  .card.selected { border-color: #5B6EE1; background: rgba(91,110,225,0.12); }
+  .card-preview { height: 120px; border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
+  .card-label { font-weight: 600; }
+  .card-tags { opacity: 0.6; font-size: 12px; margin-top: 4px; }
+  .group-heading { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.5; margin: 24px 0 8px; }
+  button.primary { background: #5B6EE1; color: white; border: 0; padding: 12px 20px; border-radius: 6px; font: inherit; cursor: pointer; }
+  button.ghost { background: transparent; color: inherit; border: 1px solid rgba(255,255,255,0.2); padding: 12px 20px; border-radius: 6px; font: inherit; cursor: pointer; margin-right: 8px; }
+  .notice { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); padding: 12px; border-radius: 6px; margin: 16px 0; font-size: 14px; }
+  .review-row { display: grid; grid-template-columns: 160px 1fr auto; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  a.edit { color: #5B6EE1; text-decoration: none; font-size: 13px; }
+  .swatch-row { display: flex; gap: 8px; }
+  .swatch { width: 40px; height: 40px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+<main id="app">loading…</main>
+<script>
+(function () {
+  var DIMENSIONS = ${dimensionsJson};
+  var MOODS = ${moodsJson};
+  var state = { choices: null, step: 0, mood: null, picks: {} };
+  var app = document.getElementById('app');
+
+  fetch('/choices.json').then(function (r) { return r.json(); }).then(function (data) {
+    state.choices = data.dimensions;
+    render();
+  });
+
+  function render() {
+    if (!state.choices) { app.textContent = 'loading…'; return; }
+    var totalSteps = 1 + state.choices.length + 1;
+    if (state.step === 0) return renderWelcome(totalSteps);
+    if (state.step <= state.choices.length) return renderDimension(state.step - 1, totalSteps);
+    return renderReview(totalSteps);
+  }
+
+  function progressBar(step, total) {
+    var pct = Math.round((step / (total - 1)) * 100);
+    return '<div class="progress"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+  }
+
+  function renderWelcome(total) {
+    app.innerHTML =
+      progressBar(0, total) +
+      '<h1>taste init</h1>' +
+      '<p class="lead">Pick one option per dimension. We write preference_vector.json when you are done.</p>' +
+      '<button class="primary" id="start">Start</button>';
+    document.getElementById('start').onclick = function () { state.step = 1; render(); };
+  }
+
+  function renderDimension(idx, total) {
+    var dim = state.choices[idx];
+    var selected = state.picks[dim.dimension];
+    var recommended = [];
+    var others = [];
+    for (var i = 0; i < dim.options.length; i++) {
+      var opt = dim.options[i];
+      (state.mood && opt.moodTags.indexOf(state.mood) >= 0 ? recommended : others).push(opt);
+    }
+    var html =
+      progressBar(idx + 1, total) +
+      '<h1>' + dim.question + '</h1>' +
+      '<p class="lead">Step ' + (idx + 1) + ' of ' + state.choices.length + '</p>';
+    if (state.mood && recommended.length) {
+      html += '<div class="group-heading">Recommended for ' + state.mood + '</div>';
+      html += '<div class="grid">' + recommended.map(cardHtml).join('') + '</div>';
+      html += '<div class="group-heading">Other options</div>';
+      html += '<div class="grid">' + others.map(cardHtml).join('') + '</div>';
+    } else {
+      html += '<div class="grid">' + dim.options.map(cardHtml).join('') + '</div>';
+    }
+    html += '<div style="margin-top:32px"><button class="ghost" id="back">Back</button><button class="primary" id="next">Next</button></div>';
+    app.innerHTML = html;
+    bindCards(dim);
+    document.getElementById('back').onclick = function () { if (state.step > 0) { state.step--; render(); } };
+    document.getElementById('next').onclick = function () {
+      if (!state.picks[dim.dimension]) return;
+      if (dim.dimension === 'overall_style') state.mood = optionMood(dim, state.picks[dim.dimension]);
+      state.step++;
+      render();
+    };
+    function cardHtml(opt) {
+      var sel = state.picks[dim.dimension] === opt.id ? ' selected' : '';
+      return '<div class="card' + sel + '" data-id="' + opt.id + '">' +
+        '<div class="card-preview">' + previewHtml(dim.dimension, opt) + '</div>' +
+        '<div class="card-label">' + opt.label + '</div>' +
+        '<div class="card-tags">' + opt.moodTags.join(', ') + '</div>' +
+        '</div>';
+    }
+    function bindCards(d) {
+      var cards = app.querySelectorAll('.card');
+      cards.forEach(function (c) {
+        c.onclick = function () {
+          state.picks[d.dimension] = c.getAttribute('data-id');
+          render();
+        };
+      });
+    }
+  }
+
+  function optionMood(dim, id) {
+    for (var i = 0; i < dim.options.length; i++) if (dim.options[i].id === id) return dim.options[i].moodTags[0];
+    return null;
+  }
+
+  function previewHtml(dimension, opt) {
+    var t = opt.tokens || {};
+    if (dimension === 'color_direction') {
+      return '<div class="swatch-row" style="padding:20px">' +
+        '<div class="swatch" style="background:' + t.background + '"></div>' +
+        '<div class="swatch" style="background:' + t.text + '"></div>' +
+        '<div class="swatch" style="background:' + t.accent + '"></div>' +
+        '</div>';
+    }
+    if (dimension === 'typography') {
+      return '<div style="font-family:' + t.family + ';padding:16px">' +
+        '<div style="font-size:24px">Aa</div><div style="font-size:13px;opacity:0.7">The quick brown fox</div>' +
+        '</div>';
+    }
+    if (dimension === 'component_style') {
+      return '<div style="padding:24px;display:flex;align-items:center;justify-content:center">' +
+        '<button style="border-radius:' + (t.radius || 0) + 'px;box-shadow:' + (t.shadow || 'none') + ';border:' + (t.border || 'none') + ';padding:8px 16px;background:#5B6EE1;color:white">Button</button>' +
+        '</div>';
+    }
+    if (dimension === 'layout_spacing') {
+      return '<div style="background:rgba(255,255,255,0.05);padding:' + (t.paddingMin || 16) + 'px ' + (t.paddingMax || 32) + 'px;font-size:12px">' +
+        'padding ' + t.paddingMin + '–' + t.paddingMax + ' px' +
+        '</div>';
+    }
+    if (dimension === 'detail_elements') {
+      return '<div style="padding:24px;font-size:13px;opacity:0.8">' + opt.notesTemplate + '</div>';
+    }
+    if (dimension === 'motion') {
+      return '<div style="padding:20px"><button style="transition:transform ' + t.durationMs + 'ms ' + t.easing + ';padding:8px 16px" onmouseover="this.style.transform=\\'scale(1.06)\\'" onmouseout="this.style.transform=\\'scale(1)\\'">hover me</button></div>';
+    }
+    return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
+  }
+
+  function renderReview(total) {
+    var rows = state.choices.map(function (d) {
+      var pickId = state.picks[d.dimension];
+      var opt = d.options.find(function (o) { return o.id === pickId; });
+      var drift = state.mood && opt.moodTags.indexOf(state.mood) < 0;
+      return '<div class="review-row">' +
+        '<div>' + d.dimension + '</div>' +
+        '<div>' + opt.label + (drift ? ' <span style="opacity:0.6">(off-mood)</span>' : '') + '</div>' +
+        '<a class="edit" href="#" data-step="' + (state.choices.indexOf(d) + 1) + '">Edit</a>' +
+        '</div>';
+    }).join('');
+    app.innerHTML =
+      progressBar(total - 1, total) +
+      '<h1>Review</h1>' +
+      '<p class="lead">Confirm your 7 picks, then write the file.</p>' +
+      rows +
+      '<div style="margin-top:24px"><button class="ghost" id="back">Back</button><button class="primary" id="submit">Write preference_vector.json</button></div>' +
+      '<div id="msg"></div>';
+    var edits = app.querySelectorAll('a.edit');
+    edits.forEach(function (a) {
+      a.onclick = function (e) { e.preventDefault(); state.step = parseInt(a.getAttribute('data-step'), 10); render(); };
+    });
+    document.getElementById('back').onclick = function () { state.step--; render(); };
+    document.getElementById('submit').onclick = submit;
+  }
+
+  function submit() {
+    fetch('/submit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mood: state.mood, picks: state.picks })
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) { document.getElementById('msg').innerHTML = '<div class="notice">' + (res.j.error || 'error') + '</div>'; return; }
+        app.innerHTML = '<h1>Done.</h1><p class="lead">Wrote ' + res.j.path + '. You can close this tab.</p>';
+        fetch('/shutdown', { method: 'POST' });
+      });
+  }
+})();
+</script>
+</body>
+</html>`;
 }
