@@ -53,6 +53,10 @@ const COLOR_OPTIONS: ChoiceOption[] = [
   { id: "concrete-gray",  label: "Concrete Gray",    moodTags: ["brutalist"],                   sourceRefs: ["linear"], tokens: { background: "#D4D4D4", text: "#0A0A0A", accent: "#DC2626" }, notesTemplate: "Background #D4D4D4, primary text #0A0A0A, accent #DC2626", render: "color" },
   { id: "cobalt-ivory",   label: "Cobalt + Ivory",   moodTags: ["editorial", "vivid-modern"],   sourceRefs: ["stripe"], tokens: { background: "#FDFCF8", text: "#0B1A3A", accent: "#1E3A8A" }, notesTemplate: "Background #FDFCF8, primary text #0B1A3A, accent #1E3A8A", render: "color" },
   { id: "violet-haze",    label: "Violet Haze",      moodTags: ["vivid-modern", "playful"],     sourceRefs: ["vercel"], tokens: { background: "#1B1033", text: "#F3E8FF", accent: "#A855F7" }, notesTemplate: "Background #1B1033, primary text #F3E8FF, accent #A855F7", render: "color" },
+  { id: "warm-sunset",   label: "Warm Sunset",   moodTags: ["warm-technical", "editorial", "playful"], sourceRefs: ["custom"], tokens: { background: "#FFF8E7", text: "#2D1B00", accent: "#FF6B1A" }, notesTemplate: "Background #FFF8E7, primary text #2D1B00, accent #FF6B1A", render: "color" },
+  { id: "ocean-mist",    label: "Ocean Mist",    moodTags: ["editorial", "warm-technical"],            sourceRefs: ["custom"], tokens: { background: "#E8F4F8", text: "#0A2740", accent: "#00A3B4" }, notesTemplate: "Background #E8F4F8, primary text #0A2740, accent #00A3B4", render: "color" },
+  { id: "rose-graphite", label: "Rose on Graphite", moodTags: ["vivid-modern", "minimal", "playful"], sourceRefs: ["custom"], tokens: { background: "#1F1D1D", text: "#F5EBEB", accent: "#E85D75" }, notesTemplate: "Background #1F1D1D, primary text #F5EBEB, accent #E85D75", render: "color" },
+  { id: "emerald-ivory", label: "Emerald on Ivory", moodTags: ["editorial", "minimal"],                sourceRefs: ["custom"], tokens: { background: "#FDFCF3", text: "#0F2E1B", accent: "#0A7B3E" }, notesTemplate: "Background #FDFCF3, primary text #0F2E1B, accent #0A7B3E", render: "color" },
 ];
 
 const TYPOGRAPHY_OPTIONS: ChoiceOption[] = [
