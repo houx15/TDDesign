@@ -17,6 +17,10 @@ export interface StyleBundle {
   motionDurationMs: number;
   motionEasing: string;
   mood: string;
+  headingScale: number;
+  bodySize: number;
+  gap: number;
+  alignment: "centered" | "left" | "split";
 }
 
 export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
@@ -34,6 +38,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 150,
     motionEasing: "ease-out",
     mood: "minimal-precise",
+    headingScale: 28,
+    bodySize: 14,
+    gap: 24,
+    alignment: "centered",
   },
   "editorial-serif": {
     background: "#FDFCF8",
@@ -49,6 +57,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 400,
     motionEasing: "ease-in-out",
     mood: "editorial-serif",
+    headingScale: 32,
+    bodySize: 14,
+    gap: 20,
+    alignment: "left",
   },
   "playful-rounded": {
     background: "#FDE8F4",
@@ -64,6 +76,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 220,
     motionEasing: "cubic-bezier(0.34,1.56,0.64,1)",
     mood: "playful-rounded",
+    headingScale: 26,
+    bodySize: 13,
+    gap: 16,
+    alignment: "centered",
   },
   "brutalist-raw": {
     background: "#D4D4D4",
@@ -79,6 +95,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 0,
     motionEasing: "linear",
     mood: "brutalist-raw",
+    headingScale: 44,
+    bodySize: 14,
+    gap: 8,
+    alignment: "left",
   },
   "warm-technical": {
     background: "#F7F3EC",
@@ -94,6 +114,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 150,
     motionEasing: "ease-out",
     mood: "warm-technical",
+    headingScale: 22,
+    bodySize: 13,
+    gap: 16,
+    alignment: "left",
   },
   "vivid-modern": {
     background: "#1B1033",
@@ -109,6 +133,10 @@ export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
     motionDurationMs: 220,
     motionEasing: "cubic-bezier(0.34,1.56,0.64,1)",
     mood: "vivid-modern",
+    headingScale: 36,
+    bodySize: 13,
+    gap: 20,
+    alignment: "centered",
   },
 };
 

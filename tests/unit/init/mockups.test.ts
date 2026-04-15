@@ -129,3 +129,14 @@ describe("templates interpolated with mood defaults", () => {
     expect(out).toContain("Inter");
   });
 });
+
+describe("StyleBundle v2B new fields", () => {
+  it("every mood in MOOD_DEFAULTS has headingScale, bodySize, gap, alignment", () => {
+    for (const [moodKey, bundle] of Object.entries(MOOD_DEFAULTS)) {
+      expect(typeof bundle.headingScale).toBe("number");
+      expect(typeof bundle.bodySize).toBe("number");
+      expect(typeof bundle.gap).toBe("number");
+      expect(["centered", "left", "split"]).toContain(bundle.alignment);
+    }
+  });
+});
