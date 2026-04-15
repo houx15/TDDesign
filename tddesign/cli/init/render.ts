@@ -48,7 +48,7 @@ export function buildIndexHtml(): string {
   var OVERALL_STYLE_MOCKUPS = ${mockupsJson};
   var MOOD_DEFAULTS = ${moodDefaultsJson};
   var DIM_ORDER = ["color_direction","typography","component_style","layout_spacing","detail_elements","motion"];
-  var state = { choices: null, step: 0, mood: null, picks: {}, currentStyle: null };
+  var state = { choices: null, step: 0, mood: null, picks: {}, currentStyle: null, customTokens: {} };
 
   function interpolate(tpl, slots) {
     return tpl.replace(/\\{\\{(\\w+)\\}\\}/g, function (_, k) {
@@ -87,6 +87,13 @@ export function buildIndexHtml(): string {
       var dim = DIM_ORDER[i];
       var pickId = state.picks[dim];
       if (!pickId) continue;
+      if (dim === 'color_direction' && pickId === 'custom' && state.customTokens.color_direction) {
+        var ct = state.customTokens.color_direction;
+        bundle.background = ct.background;
+        bundle.text = ct.text;
+        bundle.accent = ct.accent;
+        continue;
+      }
       var option = findOption(dim, pickId);
       if (option && option.tokens) {
         for (var k2 in option.tokens) bundle[k2] = option.tokens[k2];
@@ -159,8 +166,23 @@ export function buildIndexHtml(): string {
     };
     function cardHtml(opt) {
       var sel = state.picks[dim.dimension] === opt.id ? ' selected' : '';
+      var preview;
+      if (dim.dimension === 'color_direction' && opt.id === 'custom') {
+        var c = state.customTokens.color_direction || { background: '#000000', text: '#FFFFFF', accent: '#888888' };
+        preview =
+          '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;box-sizing:border-box;background:' + c.background + ';color:' + c.text + '">' +
+            '<div style="font-size:12px;opacity:0.7">Your own palette</div>' +
+            '<div style="display:flex;gap:10px;align-items:center">' +
+              '<label style="display:flex;flex-direction:column;align-items:center;font-size:10px;opacity:0.7;gap:4px">bg<input type="color" data-slot="background" value="' + c.background + '" style="width:36px;height:28px;border:none;background:transparent;cursor:pointer"></label>' +
+              '<label style="display:flex;flex-direction:column;align-items:center;font-size:10px;opacity:0.7;gap:4px">text<input type="color" data-slot="text" value="' + c.text + '" style="width:36px;height:28px;border:none;background:transparent;cursor:pointer"></label>' +
+              '<label style="display:flex;flex-direction:column;align-items:center;font-size:10px;opacity:0.7;gap:4px">accent<input type="color" data-slot="accent" value="' + c.accent + '" style="width:36px;height:28px;border:none;background:transparent;cursor:pointer"></label>' +
+            '</div>' +
+          '</div>';
+      } else {
+        preview = previewHtml(dim.dimension, opt);
+      }
       return '<div class="card' + sel + '" data-id="' + opt.id + '">' +
-        '<div class="card-preview">' + previewHtml(dim.dimension, opt) + '</div>' +
+        '<div class="card-preview" style="height:320px">' + preview + '</div>' +
         '<div class="card-label">' + opt.label + '</div>' +
         '<div class="card-tags">' + opt.moodTags.join(', ') + '</div>' +
         '</div>';
@@ -168,12 +190,29 @@ export function buildIndexHtml(): string {
     function bindCards(d) {
       var cards = app.querySelectorAll('.card');
       cards.forEach(function (c) {
-        c.onclick = function () {
-          state.picks[d.dimension] = c.getAttribute('data-id');
-          if (d.dimension === 'overall_style') state.mood = c.getAttribute('data-id');
+        var id = c.getAttribute('data-id');
+        c.onclick = function (e) {
+          if (e.target && e.target.tagName === 'INPUT') return;
+          state.picks[d.dimension] = id;
+          if (d.dimension === 'overall_style') state.mood = id;
           recomputeStyle();
           render();
         };
+        if (d.dimension === 'color_direction' && id === 'custom') {
+          var inputs = c.querySelectorAll('input[type="color"]');
+          inputs.forEach(function (inp) {
+            inp.oninput = function () {
+              if (!state.customTokens.color_direction) {
+                state.customTokens.color_direction = { background: '#000000', text: '#FFFFFF', accent: '#888888' };
+              }
+              var slot = inp.getAttribute('data-slot');
+              state.customTokens.color_direction[slot] = inp.value;
+              state.picks[d.dimension] = 'custom';
+              recomputeStyle();
+              render();
+            };
+          });
+        }
       });
     }
   }
@@ -229,10 +268,14 @@ export function buildIndexHtml(): string {
   }
 
   function submit() {
+    var body = { mood: state.mood, picks: state.picks };
+    if (state.picks.color_direction === 'custom' && state.customTokens.color_direction) {
+      body.customTokens = state.customTokens;
+    }
     fetch('/submit', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ mood: state.mood, picks: state.picks })
+      body: JSON.stringify(body)
     }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) { document.getElementById('msg').innerHTML = '<div class="notice">' + (res.j.error || 'error') + '</div>'; return; }

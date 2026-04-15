@@ -39,6 +39,17 @@ describe("render.buildIndexHtml", () => {
     }
   });
 
+  it("embeds the custom color option id handling in the served HTML", () => {
+    const html2 = buildIndexHtml();
+    // The inline script branches on the 'custom' color_direction pick id.
+    expect(html2).toContain("'custom'");
+  });
+
+  it("includes customTokens handling in the submit code", () => {
+    const html2 = buildIndexHtml();
+    expect(html2).toContain("customTokens");
+  });
+
   it("embeds OVERALL_STYLE_MOCKUPS so the client can render the review mockup", () => {
     const overall = CHOICES.find((c) => c.dimension === "overall_style")!;
     for (const opt of overall.options) {
