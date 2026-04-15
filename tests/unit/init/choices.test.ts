@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CHOICES, MOODS } from "../../../tddesign/cli/init/choices.js";
+import { CHOICES, MOODS, PAGE_TYPE_CHOICE } from "../../../tddesign/cli/init/choices.js";
 import { DIMENSIONS } from "../../../tddesign/schemas.js";
 import { parsePreferenceVector } from "../../../tddesign/composer/notes-parser.js";
 import type { PreferenceVector } from "../../../tddesign/schemas.js";
@@ -139,5 +139,23 @@ describe("all dimensions populated", () => {
     const v = vectorFromPicks({ detail_elements: noEmoji!.id });
     const patterns = parsePreferenceVector(v).filter((c) => c.type === "pattern");
     expect(patterns.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("PAGE_TYPE_CHOICE", () => {
+  it("has exactly 2 options: landing and dashboard", () => {
+    expect(PAGE_TYPE_CHOICE.options).toHaveLength(2);
+    const ids = PAGE_TYPE_CHOICE.options.map(o => o.id).sort();
+    expect(ids).toEqual(["dashboard", "landing"]);
+  });
+
+  it("uses 'page_type' as its dimension key", () => {
+    expect(PAGE_TYPE_CHOICE.dimension).toBe("page_type");
+  });
+
+  it("every option has all 6 mood tags (moods apply to both page types)", () => {
+    for (const opt of PAGE_TYPE_CHOICE.options) {
+      expect(opt.moodTags.length).toBe(6);
+    }
   });
 });

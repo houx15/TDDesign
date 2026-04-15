@@ -104,3 +104,35 @@ export const CHOICES: DimensionChoices[] = [
   { dimension: "detail_elements", question: "Pick detail treatment.",    options: DETAIL_OPTIONS },
   { dimension: "motion",          question: "Pick a motion feel.",       options: MOTION_OPTIONS },
 ];
+
+// page_type is a synthetic Q0 dimension. It is NOT in the graded `Dimension`
+// union and never reaches the parser/checker. It exists only to gate which
+// mockup column the questionnaire renders.
+const PAGE_TYPE_OPTIONS: ChoiceOption[] = [
+  {
+    id: "landing",
+    label: "Landing / Marketing",
+    moodTags: [...MOODS],
+    sourceRefs: ["builtin"],
+    tokens: {},
+    notesTemplate: "landing marketing page",
+    render: "mood",
+  },
+  {
+    id: "dashboard",
+    label: "Dashboard / Analytics",
+    moodTags: [...MOODS],
+    sourceRefs: ["builtin"],
+    tokens: {},
+    notesTemplate: "dashboard analytics page",
+    render: "mood",
+  },
+];
+
+export const PAGE_TYPE_CHOICE: Omit<DimensionChoices, "dimension"> & {
+  dimension: "page_type";
+} = {
+  dimension: "page_type",
+  question: "What kind of page are you designing?",
+  options: PAGE_TYPE_OPTIONS,
+};
