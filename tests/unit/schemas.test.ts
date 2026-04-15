@@ -122,3 +122,46 @@ describe("schemas", () => {
     expect(() => ReportSchema.parse(report)).not.toThrow();
   });
 });
+
+describe("PreferenceVectorSchema page_type", () => {
+  it("accepts a preference vector without page_type and defaults to 'landing'", () => {
+    const raw = {
+      profile_name: "local",
+      scope: "project",
+      selections: {
+        overall_style:   { choice: "minimal-precise",   source_refs: ["linear"], notes: "" },
+        color_direction: { choice: "mono-indigo",       source_refs: ["linear"], notes: "" },
+        typography:      { choice: "geometric-sans",    source_refs: ["vercel"], notes: "" },
+        component_style: { choice: "subtle-radius-minimal-shadow", source_refs: ["linear"], notes: "" },
+        layout_spacing:  { choice: "spacious-hero",     source_refs: ["stripe"], notes: "" },
+        detail_elements: { choice: "line-icons-no-emoji", source_refs: ["linear"], notes: "" },
+        motion:          { choice: "subtle-fast",       source_refs: ["vercel"], notes: "" },
+      },
+      created_at: "2026-04-15T00:00:00.000Z",
+      updated_at: "2026-04-15T00:00:00.000Z",
+    };
+    const parsed = PreferenceVectorSchema.parse(raw);
+    expect(parsed.page_type).toBe("landing");
+  });
+
+  it("accepts page_type: 'dashboard'", () => {
+    const raw = {
+      profile_name: "local",
+      scope: "project",
+      page_type: "dashboard",
+      selections: {
+        overall_style:   { choice: "minimal-precise",   source_refs: ["linear"], notes: "" },
+        color_direction: { choice: "mono-indigo",       source_refs: ["linear"], notes: "" },
+        typography:      { choice: "geometric-sans",    source_refs: ["vercel"], notes: "" },
+        component_style: { choice: "subtle-radius-minimal-shadow", source_refs: ["linear"], notes: "" },
+        layout_spacing:  { choice: "spacious-hero",     source_refs: ["stripe"], notes: "" },
+        detail_elements: { choice: "line-icons-no-emoji", source_refs: ["linear"], notes: "" },
+        motion:          { choice: "subtle-fast",       source_refs: ["vercel"], notes: "" },
+      },
+      created_at: "2026-04-15T00:00:00.000Z",
+      updated_at: "2026-04-15T00:00:00.000Z",
+    };
+    const parsed = PreferenceVectorSchema.parse(raw);
+    expect(parsed.page_type).toBe("dashboard");
+  });
+});

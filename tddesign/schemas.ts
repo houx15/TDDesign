@@ -21,6 +21,7 @@ const SelectionSchema = z.object({
 export const PreferenceVectorSchema = z.object({
   profile_name: z.string(),
   scope: z.enum(["global", "project"]),
+  page_type: z.enum(["landing", "dashboard"]).default("landing"),
   selections: z.object({
     overall_style: SelectionSchema,
     color_direction: SelectionSchema,
