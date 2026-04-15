@@ -1,5 +1,5 @@
 import { CHOICES, MOODS } from "./choices.js";
-import { OVERALL_STYLE_MOCKUPS } from "./mockups.js";
+import { OVERALL_STYLE_MOCKUPS, MOOD_DEFAULTS } from "./mockups.js";
 
 export function buildIndexHtml(): string {
   const dimensionsJson = JSON.stringify(
@@ -7,6 +7,7 @@ export function buildIndexHtml(): string {
   );
   const moodsJson = JSON.stringify(MOODS);
   const mockupsJson = JSON.stringify(OVERALL_STYLE_MOCKUPS);
+  const moodDefaultsJson = JSON.stringify(MOOD_DEFAULTS);
 
   return `<!doctype html>
 <html lang="en">
@@ -25,7 +26,7 @@ export function buildIndexHtml(): string {
   .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; cursor: pointer; transition: border-color 150ms; }
   .card:hover { border-color: #5B6EE1; }
   .card.selected { border-color: #5B6EE1; background: rgba(91,110,225,0.12); }
-  .card-preview { height: 120px; border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
+  .card-preview { height: 320px; border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
   .card-label { font-weight: 600; }
   .card-tags { opacity: 0.6; font-size: 12px; margin-top: 4px; }
   .group-heading { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.5; margin: 24px 0 8px; }
@@ -45,7 +46,54 @@ export function buildIndexHtml(): string {
   var DIMENSIONS = ${dimensionsJson};
   var MOODS = ${moodsJson};
   var OVERALL_STYLE_MOCKUPS = ${mockupsJson};
-  var state = { choices: null, step: 0, mood: null, picks: {} };
+  var MOOD_DEFAULTS = ${moodDefaultsJson};
+  var DIM_ORDER = ["color_direction","typography","component_style","layout_spacing","detail_elements","motion"];
+  var state = { choices: null, step: 0, mood: null, picks: {}, currentStyle: null };
+
+  function interpolate(tpl, slots) {
+    return tpl.replace(/\\{\\{(\\w+)\\}\\}/g, function (_, k) {
+      return slots[k] !== undefined ? String(slots[k]) : '';
+    });
+  }
+  function renderIconRow(iconStyle) {
+    if (iconStyle === 'line') return '\u2192';
+    if (iconStyle === 'filled') return '\u25B6';
+    if (iconStyle === 'emoji') return '\uD83D\uDE80';
+    return '\u25C6';
+  }
+  function deriveSlots(b) {
+    var s = {};
+    for (var k in b) s[k] = b[k];
+    s.buttonTransition = 'transform ' + b.motionDurationMs + 'ms ' + b.motionEasing;
+    s.iconRow = renderIconRow(b.iconStyle);
+    return s;
+  }
+  function findOption(dimName, id) {
+    for (var i = 0; i < state.choices.length; i++) {
+      var d = state.choices[i];
+      if (d.dimension !== dimName) continue;
+      for (var j = 0; j < d.options.length; j++) {
+        if (d.options[j].id === id) return d.options[j];
+      }
+    }
+    return null;
+  }
+  function recomputeStyle() {
+    if (!state.mood) { state.currentStyle = null; return; }
+    var bundle = {};
+    var defaults = MOOD_DEFAULTS[state.mood];
+    for (var k in defaults) bundle[k] = defaults[k];
+    for (var i = 0; i < DIM_ORDER.length; i++) {
+      var dim = DIM_ORDER[i];
+      var pickId = state.picks[dim];
+      if (!pickId) continue;
+      var option = findOption(dim, pickId);
+      if (option && option.tokens) {
+        for (var k2 in option.tokens) bundle[k2] = option.tokens[k2];
+      }
+    }
+    state.currentStyle = bundle;
+  }
   var app = document.getElementById('app');
 
   fetch('/choices.json').then(function (r) { return r.json(); }).then(function (data) {
@@ -102,15 +150,17 @@ export function buildIndexHtml(): string {
     document.getElementById('back').onclick = function () { if (state.step > 0) { state.step--; render(); } };
     document.getElementById('next').onclick = function () {
       if (!state.picks[dim.dimension]) return;
-      if (dim.dimension === 'overall_style') state.mood = optionMood(dim, state.picks[dim.dimension]);
+      if (dim.dimension === 'overall_style') {
+        state.mood = state.picks[dim.dimension];
+      }
+      recomputeStyle();
       state.step++;
       render();
     };
     function cardHtml(opt) {
       var sel = state.picks[dim.dimension] === opt.id ? ' selected' : '';
-      var previewStyle = dim.dimension === 'overall_style' ? 'height:320px' : '';
       return '<div class="card' + sel + '" data-id="' + opt.id + '">' +
-        '<div class="card-preview" style="' + previewStyle + '">' + previewHtml(dim.dimension, opt) + '</div>' +
+        '<div class="card-preview">' + previewHtml(dim.dimension, opt) + '</div>' +
         '<div class="card-label">' + opt.label + '</div>' +
         '<div class="card-tags">' + opt.moodTags.join(', ') + '</div>' +
         '</div>';
@@ -120,52 +170,29 @@ export function buildIndexHtml(): string {
       cards.forEach(function (c) {
         c.onclick = function () {
           state.picks[d.dimension] = c.getAttribute('data-id');
+          if (d.dimension === 'overall_style') state.mood = c.getAttribute('data-id');
+          recomputeStyle();
           render();
         };
       });
     }
   }
 
-  function optionMood(dim, id) {
-    for (var i = 0; i < dim.options.length; i++) if (dim.options[i].id === id) return dim.options[i].moodTags[0];
-    return null;
-  }
-
   function previewHtml(dimension, opt) {
     if (dimension === 'overall_style') {
-      if (OVERALL_STYLE_MOCKUPS[opt.id]) return OVERALL_STYLE_MOCKUPS[opt.id];
+      var bundle = MOOD_DEFAULTS[opt.id];
+      return interpolate(OVERALL_STYLE_MOCKUPS[opt.id], deriveSlots(bundle));
+    }
+    if (!state.mood) {
       return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
     }
-    var t = opt.tokens || {};
-    if (dimension === 'color_direction') {
-      return '<div class="swatch-row" style="padding:20px">' +
-        '<div class="swatch" style="background:' + t.background + '"></div>' +
-        '<div class="swatch" style="background:' + t.text + '"></div>' +
-        '<div class="swatch" style="background:' + t.accent + '"></div>' +
-        '</div>';
-    }
-    if (dimension === 'typography') {
-      return '<div style="font-family:' + t.family + ';padding:16px">' +
-        '<div style="font-size:24px">Aa</div><div style="font-size:13px;opacity:0.7">The quick brown fox</div>' +
-        '</div>';
-    }
-    if (dimension === 'component_style') {
-      return '<div style="padding:24px;display:flex;align-items:center;justify-content:center">' +
-        '<button style="border-radius:' + (t.radius || 0) + 'px;box-shadow:' + (t.shadow || 'none') + ';border:' + (t.border || 'none') + ';padding:8px 16px;background:#5B6EE1;color:white">Button</button>' +
-        '</div>';
-    }
-    if (dimension === 'layout_spacing') {
-      return '<div style="background:rgba(255,255,255,0.05);padding:' + (t.paddingMin || 16) + 'px ' + (t.paddingMax || 32) + 'px;font-size:12px">' +
-        'padding ' + t.paddingMin + '–' + t.paddingMax + ' px' +
-        '</div>';
-    }
-    if (dimension === 'detail_elements') {
-      return '<div style="padding:24px;font-size:13px;opacity:0.8">' + opt.notesTemplate + '</div>';
-    }
-    if (dimension === 'motion') {
-      return '<div style="padding:20px"><button style="transition:transform ' + t.durationMs + 'ms ' + t.easing + ';padding:8px 16px" onmouseover="this.style.transform=\\'scale(1.06)\\'" onmouseout="this.style.transform=\\'scale(1)\\'">hover me</button></div>';
-    }
-    return '<div style="padding:20px;font-size:13px;opacity:0.7">' + opt.label + '</div>';
+    var base = {};
+    var defaults = MOOD_DEFAULTS[state.mood];
+    for (var k in defaults) base[k] = defaults[k];
+    if (state.currentStyle) for (var k2 in state.currentStyle) base[k2] = state.currentStyle[k2];
+    if (opt.tokens) for (var k3 in opt.tokens) base[k3] = opt.tokens[k3];
+    var tpl = OVERALL_STYLE_MOCKUPS[state.mood];
+    return interpolate(tpl, deriveSlots(base));
   }
 
   function renderReview(total) {

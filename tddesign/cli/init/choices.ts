@@ -56,10 +56,10 @@ const COLOR_OPTIONS: ChoiceOption[] = [
 ];
 
 const TYPOGRAPHY_OPTIONS: ChoiceOption[] = [
-  { id: "geometric-sans",   label: "Geometric Sans",   moodTags: ["minimal", "warm-technical"],   sourceRefs: ["vercel"], tokens: { family: "Inter, system-ui, sans-serif" },           notesTemplate: "Inter geometric sans",         render: "type" },
-  { id: "humanist-sans",    label: "Humanist Sans",    moodTags: ["warm-technical", "editorial"], sourceRefs: ["stripe"], tokens: { family: "'Source Sans 3', system-ui, sans-serif" }, notesTemplate: "Source Sans humanist",         render: "type" },
-  { id: "editorial-serif",  label: "Editorial Serif",  moodTags: ["editorial"],                   sourceRefs: ["stripe"], tokens: { family: "Georgia, 'Times New Roman', serif" },       notesTemplate: "Georgia serif editorial",      render: "type" },
-  { id: "mono-technical",   label: "Mono Technical",   moodTags: ["brutalist", "warm-technical"], sourceRefs: ["linear"], tokens: { family: "'JetBrains Mono', ui-monospace, monospace" }, notesTemplate: "JetBrains Mono monospace",   render: "type" },
+  { id: "geometric-sans",   label: "Geometric Sans",   moodTags: ["minimal", "warm-technical"],   sourceRefs: ["vercel"], tokens: { fontFamily:"Inter, system-ui, sans-serif" },           notesTemplate: "Inter geometric sans",         render: "type" },
+  { id: "humanist-sans",    label: "Humanist Sans",    moodTags: ["warm-technical", "editorial"], sourceRefs: ["stripe"], tokens: { fontFamily:"'Source Sans 3', system-ui, sans-serif" }, notesTemplate: "Source Sans humanist",         render: "type" },
+  { id: "editorial-serif",  label: "Editorial Serif",  moodTags: ["editorial"],                   sourceRefs: ["stripe"], tokens: { fontFamily:"Georgia, 'Times New Roman', serif" },       notesTemplate: "Georgia serif editorial",      render: "type" },
+  { id: "mono-technical",   label: "Mono Technical",   moodTags: ["brutalist", "warm-technical"], sourceRefs: ["linear"], tokens: { fontFamily:"'JetBrains Mono', ui-monospace, monospace" }, notesTemplate: "JetBrains Mono monospace",   render: "type" },
 ];
 
 const COMPONENT_OPTIONS: ChoiceOption[] = [
@@ -84,10 +84,10 @@ const DETAIL_OPTIONS: ChoiceOption[] = [
 ];
 
 const MOTION_OPTIONS: ChoiceOption[] = [
-  { id: "subtle-fast",     label: "Subtle Fast",     moodTags: ["minimal", "warm-technical"], sourceRefs: ["vercel"], tokens: { durationMs: 150, easing: "ease-out" },                         notesTemplate: "subtle fast motion",      render: "motion" },
-  { id: "considered-slow", label: "Considered Slow", moodTags: ["editorial"],                 sourceRefs: ["stripe"], tokens: { durationMs: 400, easing: "ease-in-out" },                      notesTemplate: "considered slow motion",  render: "motion" },
-  { id: "snappy-springy",  label: "Snappy Springy",  moodTags: ["playful", "vivid-modern"],   sourceRefs: ["vercel"], tokens: { durationMs: 220, easing: "cubic-bezier(0.34,1.56,0.64,1)" },   notesTemplate: "snappy springy motion",   render: "motion" },
-  { id: "none-static",     label: "None, Static",    moodTags: ["brutalist"],                 sourceRefs: ["linear"], tokens: { durationMs: 0, easing: "linear" },                             notesTemplate: "no motion static",        render: "motion" },
+  { id: "subtle-fast",     label: "Subtle Fast",     moodTags: ["minimal", "warm-technical"], sourceRefs: ["vercel"], tokens: { motionDurationMs:150, motionEasing:"ease-out" },                         notesTemplate: "subtle fast motion",      render: "motion" },
+  { id: "considered-slow", label: "Considered Slow", moodTags: ["editorial"],                 sourceRefs: ["stripe"], tokens: { motionDurationMs:400, motionEasing:"ease-in-out" },                      notesTemplate: "considered slow motion",  render: "motion" },
+  { id: "snappy-springy",  label: "Snappy Springy",  moodTags: ["playful", "vivid-modern"],   sourceRefs: ["vercel"], tokens: { motionDurationMs:220, motionEasing:"cubic-bezier(0.34,1.56,0.64,1)" },   notesTemplate: "snappy springy motion",   render: "motion" },
+  { id: "none-static",     label: "None, Static",    moodTags: ["brutalist"],                 sourceRefs: ["linear"], tokens: { motionDurationMs:0, motionEasing:"linear" },                             notesTemplate: "no motion static",        render: "motion" },
 ];
 
 export const CHOICES: DimensionChoices[] = [
