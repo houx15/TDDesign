@@ -3,6 +3,115 @@
 // sized to fit a 480x320 card preview. Keep literals stable — tests
 // assert canonical headline copy.
 
+export interface StyleBundle {
+  background: string;
+  text: string;
+  accent: string;
+  fontFamily: string;
+  radius: number;
+  shadow: string;
+  border: string;
+  paddingMin: number;
+  paddingMax: number;
+  iconStyle: "line" | "filled" | "emoji" | "duotone";
+  motionDurationMs: number;
+  motionEasing: string;
+  mood: string;
+}
+
+export const MOOD_DEFAULTS: Record<string, StyleBundle> = {
+  "minimal-precise": {
+    background: "#0F0F10",
+    text: "#FAFAFA",
+    accent: "#5B6EE1",
+    fontFamily: "Inter, system-ui, sans-serif",
+    radius: 6,
+    shadow: "0 1px 2px rgba(0,0,0,0.06)",
+    border: "none",
+    paddingMin: 48,
+    paddingMax: 96,
+    iconStyle: "line",
+    motionDurationMs: 150,
+    motionEasing: "ease-out",
+    mood: "minimal-precise",
+  },
+  "editorial-serif": {
+    background: "#FDFCF8",
+    text: "#1A1A1A",
+    accent: "#0057FF",
+    fontFamily: "Georgia, 'Times New Roman', serif",
+    radius: 4,
+    shadow: "none",
+    border: "none",
+    paddingMin: 64,
+    paddingMax: 128,
+    iconStyle: "duotone",
+    motionDurationMs: 400,
+    motionEasing: "ease-in-out",
+    mood: "editorial-serif",
+  },
+  "playful-rounded": {
+    background: "#FDE8F4",
+    text: "#1A1033",
+    accent: "#A855F7",
+    fontFamily: "Inter, system-ui, sans-serif",
+    radius: 16,
+    shadow: "0 8px 24px rgba(168,85,247,0.2)",
+    border: "none",
+    paddingMin: 32,
+    paddingMax: 64,
+    iconStyle: "emoji",
+    motionDurationMs: 220,
+    motionEasing: "cubic-bezier(0.34,1.56,0.64,1)",
+    mood: "playful-rounded",
+  },
+  "brutalist-raw": {
+    background: "#D4D4D4",
+    text: "#0A0A0A",
+    accent: "#DC2626",
+    fontFamily: "'Arial Black', Arial, sans-serif",
+    radius: 0,
+    shadow: "none",
+    border: "4px solid #0A0A0A",
+    paddingMin: 16,
+    paddingMax: 32,
+    iconStyle: "filled",
+    motionDurationMs: 0,
+    motionEasing: "linear",
+    mood: "brutalist-raw",
+  },
+  "warm-technical": {
+    background: "#F7F3EC",
+    text: "#1A1A1A",
+    accent: "#C2410C",
+    fontFamily: "Inter, system-ui, sans-serif",
+    radius: 6,
+    shadow: "0 1px 2px rgba(0,0,0,0.06)",
+    border: "none",
+    paddingMin: 32,
+    paddingMax: 64,
+    iconStyle: "line",
+    motionDurationMs: 150,
+    motionEasing: "ease-out",
+    mood: "warm-technical",
+  },
+  "vivid-modern": {
+    background: "#1B1033",
+    text: "#F3E8FF",
+    accent: "#A855F7",
+    fontFamily: "Inter, system-ui, sans-serif",
+    radius: 12,
+    shadow: "0 8px 32px rgba(168,85,247,0.3)",
+    border: "1px solid rgba(255,255,255,0.3)",
+    paddingMin: 40,
+    paddingMax: 80,
+    iconStyle: "duotone",
+    motionDurationMs: 220,
+    motionEasing: "cubic-bezier(0.34,1.56,0.64,1)",
+    mood: "vivid-modern",
+  },
+};
+
 export const OVERALL_STYLE_MOCKUPS: Record<string, string> = {
   "minimal-precise": [
     '<div style="width:100%;height:100%;background:#0F0F10;color:#FAFAFA;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 32px;box-sizing:border-box;font-family:Inter,system-ui,sans-serif">',

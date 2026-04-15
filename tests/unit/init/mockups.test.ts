@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { OVERALL_STYLE_MOCKUPS } from "../../../tddesign/cli/init/mockups.js";
+import {
+  OVERALL_STYLE_MOCKUPS,
+  MOOD_DEFAULTS,
+  type StyleBundle,
+} from "../../../tddesign/cli/init/mockups.js";
 import { CHOICES } from "../../../tddesign/cli/init/choices.js";
 import { buildIndexHtml } from "../../../tddesign/cli/init/render.js";
 
@@ -36,5 +40,41 @@ describe("overall_style mockups", () => {
   it("SPA HTML embeds the minimal-precise headline (mockup wired into render)", () => {
     const html = buildIndexHtml();
     expect(html).toContain("Write less. Ship more.");
+  });
+});
+
+describe("MOOD_DEFAULTS", () => {
+  const overall = CHOICES.find((c) => c.dimension === "overall_style")!;
+
+  it("has one bundle per mood id", () => {
+    for (const opt of overall.options) {
+      expect(MOOD_DEFAULTS[opt.id]).toBeDefined();
+    }
+  });
+
+  it("every bundle has every StyleBundle field populated with the right primitive type", () => {
+    const numKeys: (keyof StyleBundle)[] = [
+      "radius",
+      "paddingMin",
+      "paddingMax",
+      "motionDurationMs",
+    ];
+    const strKeys: (keyof StyleBundle)[] = [
+      "background",
+      "text",
+      "accent",
+      "fontFamily",
+      "shadow",
+      "border",
+      "iconStyle",
+      "motionEasing",
+      "mood",
+    ];
+    for (const opt of overall.options) {
+      const b = MOOD_DEFAULTS[opt.id];
+      for (const k of numKeys) expect(typeof b[k]).toBe("number");
+      for (const k of strKeys) expect(typeof b[k]).toBe("string");
+      expect(b.mood).toBe(opt.id);
+    }
   });
 });
