@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { assembleVector, writeVector } from "../../../tddesign/cli/init/writer.js";
+import { assembleVector, writeVector, type SubmitPayload } from "../../../tddesign/cli/init/writer.js";
 import { CHOICES } from "../../../tddesign/cli/init/choices.js";
 import { PreferenceVectorSchema } from "../../../tddesign/schemas.js";
 
@@ -72,6 +72,43 @@ describe("writer.assembleVector", () => {
         },
       })
     ).toThrow(/invalid custom hex/i);
+  });
+});
+
+describe("assembleVector page_type", () => {
+  it("writes page_type: 'dashboard' when payload specifies it", () => {
+    const payload: SubmitPayload = {
+      pageType: "dashboard",
+      mood: "minimal",
+      picks: {
+        overall_style: "minimal-precise",
+        color_direction: "mono-indigo",
+        typography: "geometric-sans",
+        component_style: "subtle-radius-minimal-shadow",
+        layout_spacing: "compact-dashboard",
+        detail_elements: "line-icons-no-emoji",
+        motion: "subtle-fast",
+      },
+    };
+    const v = assembleVector(payload);
+    expect(v.page_type).toBe("dashboard");
+  });
+
+  it("defaults to 'landing' when payload omits pageType", () => {
+    const payload = {
+      mood: "minimal",
+      picks: {
+        overall_style: "minimal-precise",
+        color_direction: "mono-indigo",
+        typography: "geometric-sans",
+        component_style: "subtle-radius-minimal-shadow",
+        layout_spacing: "airy-centered",
+        detail_elements: "line-icons-no-emoji",
+        motion: "subtle-fast",
+      },
+    } as SubmitPayload;
+    const v = assembleVector(payload);
+    expect(v.page_type).toBe("landing");
   });
 });
 

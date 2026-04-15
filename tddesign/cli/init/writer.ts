@@ -3,6 +3,7 @@ import { PreferenceVectorSchema, type PreferenceVector } from "../../schemas.js"
 import { CHOICES, type Mood } from "./choices.js";
 
 export interface SubmitPayload {
+  pageType?: "landing" | "dashboard";
   mood: Mood;
   picks: {
     overall_style: string;
@@ -58,6 +59,7 @@ export function assembleVector(payload: SubmitPayload): PreferenceVector {
   const vector: PreferenceVector = {
     profile_name: "local",
     scope: "project",
+    page_type: payload.pageType ?? "landing",
     selections,
     created_at: now,
     updated_at: now,
