@@ -3,6 +3,8 @@ import { parse } from "parse5";
 export interface FlatElement {
   tag: string;
   classes: string[];
+  id?: string;
+  style?: string;
   text: string;
 }
 
@@ -23,9 +25,18 @@ export function flatten(html: string): FlatElement[] {
 
 function walk(node: ParseNode, out: FlatElement[]): void {
   if (node.tagName) {
-    const classAttr = (node.attrs ?? []).find((a) => a.name === "class");
+    const attrs = node.attrs ?? [];
+    const classAttr = attrs.find((a) => a.name === "class");
     const classes = classAttr ? classAttr.value.split(/\s+/).filter(Boolean) : [];
-    out.push({ tag: node.tagName, classes, text: textOf(node) });
+    const idAttr = attrs.find((a) => a.name === "id");
+    const styleAttr = attrs.find((a) => a.name === "style");
+    out.push({
+      tag: node.tagName,
+      classes,
+      id: idAttr?.value,
+      style: styleAttr?.value,
+      text: textOf(node),
+    });
   }
   for (const child of node.childNodes ?? []) walk(child, out);
 }
