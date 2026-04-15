@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   OVERALL_STYLE_MOCKUPS,
   MOOD_DEFAULTS,
+  interpolate,
+  deriveSlots,
   type StyleBundle,
 } from "../../../tddesign/cli/init/mockups.js";
 import { CHOICES } from "../../../tddesign/cli/init/choices.js";
@@ -76,5 +78,54 @@ describe("MOOD_DEFAULTS", () => {
       for (const k of strKeys) expect(typeof b[k]).toBe("string");
       expect(b.mood).toBe(opt.id);
     }
+  });
+});
+
+describe("interpolate", () => {
+  it("substitutes {{slot}} placeholders", () => {
+    const out = interpolate("a {{x}} b {{y}} c", { x: "1", y: 2 });
+    expect(out).toBe("a 1 b 2 c");
+  });
+
+  it("leaves empty string for missing slots", () => {
+    expect(interpolate("{{missing}}", {})).toBe("");
+  });
+});
+
+describe("deriveSlots", () => {
+  it("adds buttonTransition and iconRow derived from bundle", () => {
+    const slots = deriveSlots(MOOD_DEFAULTS["minimal-precise"]);
+    expect(slots.buttonTransition).toBe("transform 150ms ease-out");
+    expect(slots.iconRow).toBe("→");
+  });
+});
+
+describe("templates interpolated with mood defaults", () => {
+  const overall = CHOICES.find((c) => c.dimension === "overall_style")!;
+
+  it("every template produces no leftover placeholders when interpolated with its mood default", () => {
+    for (const opt of overall.options) {
+      const out = interpolate(
+        OVERALL_STYLE_MOCKUPS[opt.id],
+        deriveSlots(MOOD_DEFAULTS[opt.id]),
+      );
+      expect(out).not.toMatch(/\{\{\w+\}\}/);
+    }
+  });
+
+  it("minimal-precise interpolated with paper-black color tokens yields #FFFFFF and the original headline", () => {
+    const bundle: StyleBundle = {
+      ...MOOD_DEFAULTS["minimal-precise"],
+      background: "#FFFFFF",
+      text: "#111111",
+      accent: "#0057FF",
+    };
+    const out = interpolate(
+      OVERALL_STYLE_MOCKUPS["minimal-precise"],
+      deriveSlots(bundle),
+    );
+    expect(out).toContain("#FFFFFF");
+    expect(out).toContain("Write less. Ship more.");
+    expect(out).toContain("Inter");
   });
 });
