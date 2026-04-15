@@ -47,13 +47,13 @@ describe("composer", () => {
     expect(bg.expected).toBe("#0F0F10");
   });
 
-  it("generates the hero padding range check with bounds 48..96 px", () => {
+  it("generates the hero padding range check with bounds 32..64 px", () => {
     const { checks } = compose(vector, emptyLibrary);
     const pad = checks.find((c) => c.id === "layout.hero_section_padding");
     expect(pad?.type).toBe("range");
     if (pad?.type === "range") {
-      expect(pad.min).toBe(48);
-      expect(pad.max).toBe(96);
+      expect(pad.min).toBe(32);
+      expect(pad.max).toBe(64);
       expect(pad.unit).toBe("px");
     }
   });

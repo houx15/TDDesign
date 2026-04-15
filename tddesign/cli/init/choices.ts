@@ -75,10 +75,51 @@ const COMPONENT_OPTIONS: ChoiceOption[] = [
 ];
 
 const LAYOUT_OPTIONS: ChoiceOption[] = [
-  { id: "spacious-hero",     label: "Spacious Hero",     moodTags: ["minimal", "editorial"],        sourceRefs: ["stripe"], tokens: { paddingMin: 48, paddingMax: 96 },  notesTemplate: "Section padding between 48 and 96 px",   render: "layout" },
-  { id: "compact-dense",     label: "Compact Dense",     moodTags: ["warm-technical", "brutalist"], sourceRefs: ["linear"], tokens: { paddingMin: 16, paddingMax: 32 },  notesTemplate: "Section padding between 16 and 32 px",   render: "layout" },
-  { id: "medium-breath",     label: "Medium Breath",     moodTags: ["warm-technical", "playful"],   sourceRefs: ["vercel"], tokens: { paddingMin: 32, paddingMax: 64 },  notesTemplate: "Section padding between 32 and 64 px",   render: "layout" },
-  { id: "editorial-margins", label: "Editorial Margins", moodTags: ["editorial"],                   sourceRefs: ["stripe"], tokens: { paddingMin: 64, paddingMax: 128 }, notesTemplate: "Section padding between 64 and 128 px",  render: "layout" },
+  {
+    id: "airy-centered",
+    label: "Airy Centered",
+    moodTags: ["minimal", "editorial", "vivid-modern"],
+    sourceRefs: ["stripe"],
+    tokens: { paddingMin: 64, paddingMax: 128, headingScale: 36, bodySize: 15, gap: 32, alignment: "centered" },
+    notesTemplate: "Section padding between 64 and 128 px",
+    render: "layout",
+  },
+  {
+    id: "tight-left",
+    label: "Tight Left-Aligned",
+    moodTags: ["warm-technical", "brutalist", "minimal"],
+    sourceRefs: ["linear"],
+    tokens: { paddingMin: 24, paddingMax: 48, headingScale: 28, bodySize: 14, gap: 16, alignment: "left" },
+    notesTemplate: "Section padding between 24 and 48 px",
+    render: "layout",
+  },
+  {
+    id: "editorial-wide",
+    label: "Editorial Wide Margins",
+    moodTags: ["editorial"],
+    sourceRefs: ["stripe"],
+    tokens: { paddingMin: 80, paddingMax: 160, headingScale: 44, bodySize: 16, gap: 28, alignment: "left" },
+    notesTemplate: "Section padding between 80 and 160 px",
+    render: "layout",
+  },
+  {
+    id: "dense-split",
+    label: "Dense Split",
+    moodTags: ["warm-technical", "playful", "vivid-modern"],
+    sourceRefs: ["vercel"],
+    tokens: { paddingMin: 32, paddingMax: 64, headingScale: 24, bodySize: 13, gap: 20, alignment: "split" },
+    notesTemplate: "Section padding between 32 and 64 px",
+    render: "layout",
+  },
+  {
+    id: "compact-dashboard",
+    label: "Compact Dashboard",
+    moodTags: ["warm-technical", "minimal", "brutalist"],
+    sourceRefs: ["linear"],
+    tokens: { paddingMin: 16, paddingMax: 32, headingScale: 20, bodySize: 12, gap: 12, alignment: "left" },
+    notesTemplate: "Section padding between 16 and 32 px",
+    render: "layout",
+  },
 ];
 
 const DETAIL_OPTIONS: ChoiceOption[] = [

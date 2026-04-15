@@ -23,9 +23,9 @@
       "notes": ""
     },
     "layout_spacing": {
-      "choice": "spacious-hero",
-      "source_refs": ["stripe"],
-      "notes": "Section padding between 48 and 96 px"
+      "choice": "dense-split",
+      "source_refs": ["vercel"],
+      "notes": "Section padding between 32 and 64 px"
     },
     "detail_elements": {
       "choice": "line-icons-no-emoji",

@@ -136,7 +136,7 @@ describe("notes-parser: range extractor", () => {
   it("extracts the frozen hero padding range from the fixture notes", () => {
     const v = makeVector({
       layout_spacing: {
-        choice: "spacious-hero",
+        choice: "dense-split",
         notes: "Section padding between 48 and 96 px",
       },
     });

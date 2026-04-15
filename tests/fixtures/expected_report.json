@@ -25,9 +25,9 @@
     {
       "check_id": "layout.hero_section_padding",
       "passed": false,
-      "expected": "48px..96px",
+      "expected": "32px..64px",
       "actual": "16px",
-      "message": "No padding-block value falls within [48, 96]px"
+      "message": "No padding-block value falls within [32, 64]px"
     },
     {
       "check_id": "detail.no_emoji",

@@ -142,6 +142,44 @@ describe("all dimensions populated", () => {
   });
 });
 
+describe("layout_spacing (layout_rhythm) options", () => {
+  const layoutDim = CHOICES.find(d => d.dimension === "layout_spacing")!;
+
+  it("has exactly 5 options", () => {
+    expect(layoutDim.options).toHaveLength(5);
+  });
+
+  it("every option carries all 6 token fields", () => {
+    for (const opt of layoutDim.options) {
+      expect(opt.tokens).toMatchObject({
+        paddingMin: expect.any(Number),
+        paddingMax: expect.any(Number),
+        headingScale: expect.any(Number),
+        bodySize: expect.any(Number),
+        gap: expect.any(Number),
+        alignment: expect.stringMatching(/^(centered|left|split)$/),
+      });
+    }
+  });
+
+  it("every option still emits a padding-range notesTemplate", () => {
+    for (const opt of layoutDim.options) {
+      expect(opt.notesTemplate).toMatch(/Section padding between \d+ and \d+ px/);
+    }
+  });
+
+  it("option ids cover the five named rhythms", () => {
+    const ids = layoutDim.options.map(o => o.id).sort();
+    expect(ids).toEqual([
+      "airy-centered",
+      "compact-dashboard",
+      "dense-split",
+      "editorial-wide",
+      "tight-left",
+    ]);
+  });
+});
+
 describe("PAGE_TYPE_CHOICE", () => {
   it("has exactly 2 options: landing and dashboard", () => {
     expect(PAGE_TYPE_CHOICE.options).toHaveLength(2);

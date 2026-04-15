@@ -1,0 +1,57 @@
+{
+  "profile_name": "local",
+  "scope": "project",
+  "selections": {
+    "overall_style": {
+      "choice": "minimal-precise",
+      "source_refs": [
+        "linear"
+      ],
+      "notes": "minimal precise clean technical"
+    },
+    "color_direction": {
+      "choice": "custom",
+      "source_refs": [
+        "custom"
+      ],
+      "notes": "Background #0F0F10, primary text #FAFAFA, accent #5B6EE1"
+    },
+    "typography": {
+      "choice": "geometric-sans",
+      "source_refs": [
+        "vercel"
+      ],
+      "notes": "Inter geometric sans"
+    },
+    "component_style": {
+      "choice": "subtle-radius-minimal-shadow",
+      "source_refs": [
+        "linear"
+      ],
+      "notes": "subtle radius minimal shadow"
+    },
+    "layout_spacing": {
+      "choice": "dense-split",
+      "source_refs": [
+        "vercel"
+      ],
+      "notes": "Section padding between 32 and 64 px"
+    },
+    "detail_elements": {
+      "choice": "line-icons-no-emoji",
+      "source_refs": [
+        "linear"
+      ],
+      "notes": "No emoji characters anywhere"
+    },
+    "motion": {
+      "choice": "subtle-fast",
+      "source_refs": [
+        "vercel"
+      ],
+      "notes": "subtle fast motion"
+    }
+  },
+  "created_at": "2026-04-15T13:24:32.517Z",
+  "updated_at": "2026-04-15T13:24:32.517Z"
+}
